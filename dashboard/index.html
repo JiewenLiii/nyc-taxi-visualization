@@ -20,7 +20,7 @@
   .dashboard {
     display: grid;
     grid-template-columns: 1.1fr 1.1fr 1.4fr 1.1fr 1.1fr;
-    grid-template-rows: 70px 100px 1fr 1fr;
+    grid-template-rows: 70px 100px 1fr 1fr 48px;
     gap: 12px;
     padding: 12px;
     height: 100vh;
@@ -375,6 +375,162 @@
     border-radius: 12px;
     padding: 15px;
   }
+  /* 时间轴滑块 */
+  .timeline-bar {
+    grid-column: 1 / 6;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 20px;
+    background: linear-gradient(135deg, #111633, #0d1230);
+    border: 1px solid #1a2050;
+    border-radius: 10px;
+    position: relative;
+  }
+  .timeline-bar::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: linear-gradient(90deg, transparent, #3a5fff44, #00d4ff44, #3a5fff44, transparent);
+  }
+  .timeline-label {
+    font-size: 13px;
+    color: #8892b0;
+    white-space: nowrap;
+    min-width: 65px;
+  }
+  .timeline-track {
+    flex: 1;
+    height: 36px;
+    position: relative;
+    cursor: pointer;
+  }
+  .timeline-rail {
+    position: absolute;
+    top: 50%;
+    left: 0; right: 0;
+    height: 4px;
+    background: #1a2050;
+    border-radius: 2px;
+    transform: translateY(-50%);
+  }
+  .timeline-progress {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    height: 4px;
+    background: linear-gradient(90deg, #3a5fff, #00d4ff);
+    border-radius: 2px;
+    transform: translateY(-50%);
+    transition: width 0.3s ease;
+    box-shadow: 0 0 10px #00d4ff55;
+  }
+  .timeline-months {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .timeline-month {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #1a2050;
+    border: 2px solid #2a3070;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: #5a6490;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 2;
+    position: relative;
+  }
+  .timeline-month:hover {
+    border-color: #3a5fff;
+    color: #8892b0;
+    transform: scale(1.15);
+  }
+  .timeline-month.active {
+    background: linear-gradient(135deg, #3a5fff, #00d4ff);
+    border-color: #00d4ff;
+    color: #fff;
+    font-weight: bold;
+    transform: scale(1.2);
+    box-shadow: 0 0 15px #00d4ff66;
+    animation: monthPulse 2s ease-in-out infinite;
+  }
+  .timeline-month.visited {
+    background: #2a3070;
+    border-color: #3a5fff;
+    color: #8892b0;
+  }
+  @keyframes monthPulse {
+    0%, 100% { box-shadow: 0 0 15px #00d4ff66; }
+    50% { box-shadow: 0 0 25px #00d4ffaa, 0 0 40px #00d4ff44; }
+  }
+  .timeline-speed {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    min-width: 100px;
+  }
+  .timeline-speed label {
+    font-size: 11px;
+    color: #5a6490;
+  }
+  .speed-btn {
+    width: 26px; height: 26px;
+    border-radius: 4px;
+    background: #1a2050;
+    border: 1px solid #2a3070;
+    color: #8892b0;
+    font-size: 11px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+  .speed-btn:hover, .speed-btn.active {
+    border-color: #3a5fff;
+    color: #00d4ff;
+    background: #2a3070;
+  }
+  /* 进度环动画 */
+  .timeline-ring {
+    width: 20px; height: 20px;
+    position: relative;
+    margin-left: 4px;
+  }
+  .timeline-ring svg {
+    transform: rotate(-90deg);
+  }
+  .timeline-ring circle {
+    fill: none;
+    stroke-width: 3;
+  }
+  .timeline-ring .ring-bg { stroke: #1a2050; }
+  .timeline-ring .ring-fg {
+    stroke: #00d4ff;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.3s ease;
+  }
+  /* 数据变化闪光效果 */
+  @keyframes dataFlash {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
+  .kpi-value.flash {
+    animation: dataFlash 0.4s ease;
+  }
+  /* 图表切换过渡 */
+  .chart-box.transitioning {
+    border-color: #00d4ff55;
+    box-shadow: 0 0 20px #00d4ff22;
+  }
 </style>
 </head>
 <body>
@@ -527,6 +683,42 @@
     </div>
     <div class="chart-container" id="chartPrediction"></div>
   </div>
+
+  <!-- 时间轴滑块 -->
+  <div class="timeline-bar" style="grid-row: 5 / 6;">
+    <div class="timeline-label">时间轴</div>
+    <div class="timeline-track" id="timelineTrack">
+      <div class="timeline-rail"></div>
+      <div class="timeline-progress" id="timelineProgress" style="width: 100%;"></div>
+      <div class="timeline-months" id="timelineMonths">
+        <div class="timeline-month visited" data-month="all" onclick="timelineClick('all')">全</div>
+        <div class="timeline-month" data-month="1" onclick="timelineClick('1')">1</div>
+        <div class="timeline-month" data-month="2" onclick="timelineClick('2')">2</div>
+        <div class="timeline-month" data-month="3" onclick="timelineClick('3')">3</div>
+        <div class="timeline-month" data-month="4" onclick="timelineClick('4')">4</div>
+        <div class="timeline-month" data-month="5" onclick="timelineClick('5')">5</div>
+        <div class="timeline-month" data-month="6" onclick="timelineClick('6')">6</div>
+        <div class="timeline-month" data-month="7" onclick="timelineClick('7')">7</div>
+        <div class="timeline-month" data-month="8" onclick="timelineClick('8')">8</div>
+        <div class="timeline-month" data-month="9" onclick="timelineClick('9')">9</div>
+        <div class="timeline-month" data-month="10" onclick="timelineClick('10')">10</div>
+        <div class="timeline-month" data-month="11" onclick="timelineClick('11')">11</div>
+        <div class="timeline-month" data-month="12" onclick="timelineClick('12')">12</div>
+      </div>
+    </div>
+    <div class="timeline-speed">
+      <label>速度:</label>
+      <button class="speed-btn" onclick="setSpeed(3000, this)" title="慢速">0.5x</button>
+      <button class="speed-btn active" onclick="setSpeed(2000, this)" title="正常">1x</button>
+      <button class="speed-btn" onclick="setSpeed(1000, this)" title="快速">2x</button>
+    </div>
+    <div class="timeline-ring" id="timelineRing">
+      <svg width="20" height="20" viewBox="0 0 20 20">
+        <circle class="ring-bg" cx="10" cy="10" r="8"/>
+        <circle class="ring-fg" cx="10" cy="10" r="8" stroke-dasharray="50.27" stroke-dashoffset="0" id="ringFg"/>
+      </svg>
+    </div>
+  </div>
 </div>
 
 <!-- 区域详情模态框 -->
@@ -674,6 +866,8 @@ let isAutoPlaying = false;
 let autoPlayIndex = 0;
 let zoomedChart = null;
 let zoomedChartType = null;
+let autoPlaySpeed = 2000;
+let visitedMonths = new Set(['all']);
 
 // ==================== 3D汽车模型 ====================
 let scene, camera, renderer, carGroup;
@@ -1064,7 +1258,11 @@ function renderZoomTrend() {
           { offset: 0, color: '#00e67644' }, { offset: 1, color: '#00e67608' }
         ])}
       }
-    ]
+    ],
+    animationDuration: 1500,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 1000,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1121,7 +1319,11 @@ function renderZoomHeatmap() {
       emphasis: {
         itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' }
       }
-    }]
+    }],
+    animationDuration: 1200,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1172,15 +1374,21 @@ function renderZoomBorough() {
         name: 'Yellow', type: 'bar', data: yellowVals, barWidth: 20,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#ffd70088' }, { offset: 1, color: '#ffd700' }
-        ]), borderRadius: [0, 5, 5, 0] }
+        ]), borderRadius: [0, 5, 5, 0] },
+        animationDelay: function(idx) { return idx * 100; }
       },
       {
         name: 'Green', type: 'bar', data: greenVals, barWidth: 20,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#00e67688' }, { offset: 1, color: '#00e676' }
-        ]), borderRadius: [0, 5, 5, 0] }
+        ]), borderRadius: [0, 5, 5, 0] },
+        animationDelay: function(idx) { return idx * 100 + 300; }
       }
-    ]
+    ],
+    animationDuration: 1000,
+    animationEasing: 'elasticOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1221,8 +1429,14 @@ function renderZoomPayment() {
         itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' }
       },
       itemStyle: { borderColor: '#111633', borderWidth: 3, borderRadius: 6 },
-      color: colors
-    }]
+      color: colors,
+      animationType: 'scale',
+      animationEasing: 'elasticOut',
+      animationDelay: function(idx) { return idx * 120; }
+    }],
+    animationDuration: 1200,
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1265,7 +1479,11 @@ function renderZoomCorrelation() {
       type: 'heatmap', data: data,
       label: { show: true, color: '#e0e6ff', fontSize: 12, formatter: p => p.data[2].toFixed(2) },
       emphasis: { itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' } }
-    }]
+    }],
+    animationDuration: 1200,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1315,7 +1533,14 @@ function renderZoomCluster() {
       splitLine: { lineStyle: { color: '#1a205055' } },
       axisLabel: { color: '#8892b0', fontSize: 13 }
     },
-    series: series
+    series: series.map(function(s, i) {
+      s.animationDelay = function(idx) { return idx * 60 + i * 250; };
+      return s;
+    }),
+    animationDuration: 1200,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1359,8 +1584,13 @@ function renderZoomRoutes() {
       label: {
         show: true, position: 'right', color: '#8892b0', fontSize: 13,
         formatter: p => formatNumber(p.value)
-      }
-    }]
+      },
+      animationDelay: function(idx) { return idx * 80; }
+    }],
+    animationDuration: 1000,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1424,7 +1654,11 @@ function renderZoomPrediction() {
         lineStyle: { color: '#00e676', width: 2, type: 'dashed' },
         itemStyle: { color: '#00e676aa' }
       }
-    ]
+    ],
+    animationDuration: 1500,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 1000,
+    animationEasingUpdate: 'cubicInOut'
   };
   zoomedChart.setOption(option, true);
 }
@@ -1484,7 +1718,11 @@ function renderTrend(month) {
           { offset: 0, color: '#00e67633' }, { offset: 1, color: '#00e67605' }
         ])}
       }
-    ]
+    ],
+    animationDuration: 1200,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartTrend.setOption(option, true);
 }
@@ -1541,7 +1779,11 @@ function renderHeatmap(month) {
       emphasis: {
         itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' }
       }
-    }]
+    }],
+    animationDuration: 1000,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartHeatmap.setOption(option, true);
 }
@@ -1592,15 +1834,21 @@ function renderBorough(month) {
         name: 'Yellow', type: 'bar', data: yellowVals, barWidth: 7,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#ffd70088' }, { offset: 1, color: '#ffd700' }
-        ]), borderRadius: [0, 3, 3, 0] }
+        ]), borderRadius: [0, 3, 3, 0] },
+        animationDelay: function(idx) { return idx * 80; }
       },
       {
         name: 'Green', type: 'bar', data: greenVals, barWidth: 7,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#00e67688' }, { offset: 1, color: '#00e676' }
-        ]), borderRadius: [0, 3, 3, 0] }
+        ]), borderRadius: [0, 3, 3, 0] },
+        animationDelay: function(idx) { return idx * 80 + 200; }
       }
-    ]
+    ],
+    animationDuration: 800,
+    animationEasing: 'elasticOut',
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartBorough.setOption(option, true);
 
@@ -1669,8 +1917,14 @@ function renderPayment(month) {
         itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' }
       },
       itemStyle: { borderColor: '#111633', borderWidth: 2, borderRadius: 4 },
-      color: colors
-    }]
+      color: colors,
+      animationType: 'scale',
+      animationEasing: 'elasticOut',
+      animationDelay: function(idx) { return idx * 100; }
+    }],
+    animationDuration: 1000,
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartPayment.setOption(option, true);
 }
@@ -1713,7 +1967,11 @@ function renderCorrelation() {
       type: 'heatmap', data: data,
       label: { show: true, color: '#e0e6ff', fontSize: 8, formatter: p => p.data[2].toFixed(1) },
       emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
-    }]
+    }],
+    animationDuration: 1000,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartCorrelation.setOption(option, true);
 }
@@ -1763,7 +2021,14 @@ function renderCluster(month) {
       splitLine: { lineStyle: { color: '#1a205044' } },
       axisLabel: { color: '#8892b0', fontSize: 9 }
     },
-    series: series
+    series: series.map(function(s, i) {
+      s.animationDelay = function(idx) { return idx * 50 + i * 200; };
+      return s;
+    }),
+    animationDuration: 1000,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartCluster.setOption(option, true);
 }
@@ -1807,8 +2072,13 @@ function renderRoutes(month) {
       label: {
         show: true, position: 'right', color: '#8892b0', fontSize: 8,
         formatter: p => formatNumber(p.value)
-      }
-    }]
+      },
+      animationDelay: function(idx) { return idx * 60; }
+    }],
+    animationDuration: 800,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 600,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartRoutes.setOption(option, true);
 }
@@ -1872,7 +2142,11 @@ function renderPrediction(month) {
         lineStyle: { color: '#00e676', width: 1, type: 'dashed' },
         itemStyle: { color: '#00e676aa' }
       }
-    ]
+    ],
+    animationDuration: 1200,
+    animationEasing: 'cubicOut',
+    animationDurationUpdate: 800,
+    animationEasingUpdate: 'cubicInOut'
   };
   chartPrediction.setOption(option, true);
 }
@@ -1880,6 +2154,19 @@ function renderPrediction(month) {
 // ==================== 全局更新函数 ====================
 function updateAll(month) {
   currentMonth = month;
+  updateTimeline(month);
+
+  // KPI 闪光效果
+  document.querySelectorAll('.kpi-value').forEach(el => el.classList.remove('flash'));
+  void document.body.offsetWidth; // 强制回流
+  document.querySelectorAll('.kpi-value').forEach(el => el.classList.add('flash'));
+
+  // 图表过渡效果
+  document.querySelectorAll('.chart-box').forEach(el => el.classList.add('transitioning'));
+  setTimeout(() => {
+    document.querySelectorAll('.chart-box').forEach(el => el.classList.remove('transitioning'));
+  }, 600);
+
   updateKPIs(month);
   renderTrend(month);
   renderHeatmap(month);
@@ -1889,7 +2176,7 @@ function updateAll(month) {
   renderCluster(month);
   renderRoutes(month);
   renderPrediction(month);
-  
+
   if (zoomedChart && document.getElementById('zoomOverlay').classList.contains('active')) {
     switch(zoomedChartType) {
       case 'trend': renderZoomTrend(); break;
@@ -1907,8 +2194,61 @@ function updateAll(month) {
 // ==================== 月份选择事件 ====================
 document.getElementById('monthSelect').addEventListener('change', function() {
   if (isAutoPlaying) toggleAutoPlay();
+  visitedMonths.add(this.value);
   updateAll(this.value);
 });
+
+// ==================== 时间轴控制 ====================
+function updateTimeline(month) {
+  const months = document.querySelectorAll('.timeline-month');
+  const progress = document.getElementById('timelineProgress');
+  const ringFg = document.getElementById('ringFg');
+
+  months.forEach(el => {
+    const m = el.dataset.month;
+    el.classList.remove('active');
+    if (m === month) el.classList.add('active');
+    if (visitedMonths.has(m)) el.classList.add('visited');
+  });
+
+  // 进度条
+  let pct;
+  if (month === 'all') {
+    pct = 100;
+  } else {
+    pct = (parseInt(month) / 12) * 100;
+  }
+  progress.style.width = pct + '%';
+
+  // 进度环
+  const circumference = 2 * Math.PI * 8; // r=8
+  const offset = circumference * (1 - pct / 100);
+  ringFg.style.strokeDashoffset = offset;
+}
+
+function timelineClick(month) {
+  if (isAutoPlaying) toggleAutoPlay();
+  document.getElementById('monthSelect').value = month;
+  visitedMonths.add(month);
+  updateAll(month);
+}
+
+function setSpeed(speed, btn) {
+  autoPlaySpeed = speed;
+  document.querySelectorAll('.speed-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (isAutoPlaying) {
+    clearInterval(autoPlayTimer);
+    autoPlayTimer = setInterval(autoPlayTick, autoPlaySpeed);
+  }
+}
+
+function autoPlayTick() {
+  autoPlayIndex = (autoPlayIndex % 12) + 1;
+  visitedMonths.add(String(autoPlayIndex));
+  document.getElementById('monthSelect').value = String(autoPlayIndex);
+  updateAll(String(autoPlayIndex));
+}
 
 // ==================== 自动播放 ====================
 function toggleAutoPlay() {
@@ -1923,11 +2263,7 @@ function toggleAutoPlay() {
     autoPlayIndex = 0;
     btn.textContent = '⏸ 暂停播放';
     btn.classList.add('playing');
-    autoPlayTimer = setInterval(function() {
-      autoPlayIndex = (autoPlayIndex % 12) + 1;
-      document.getElementById('monthSelect').value = String(autoPlayIndex);
-      updateAll(String(autoPlayIndex));
-    }, 2000);
+    autoPlayTimer = setInterval(autoPlayTick, autoPlaySpeed);
   }
 }
 
@@ -1936,6 +2272,43 @@ window.addEventListener('resize', function() {
   allCharts.forEach(c => c.resize());
   if (zoomedChart) zoomedChart.resize();
 });
+
+// ==================== 时间轴拖拽 ====================
+(function() {
+  const track = document.getElementById('timelineTrack');
+  let isDragging = false;
+
+  function getMonthFromX(clientX) {
+    const rect = track.getBoundingClientRect();
+    const pct = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+    // 0 = "all", 1-12 mapped from pct
+    if (pct < 0.04) return 'all';
+    const m = Math.max(1, Math.min(12, Math.ceil(pct * 12)));
+    return String(m);
+  }
+
+  track.addEventListener('mousedown', function(e) {
+    if (e.target.classList.contains('timeline-month')) return;
+    isDragging = true;
+    const m = getMonthFromX(e.clientX);
+    if (isAutoPlaying) toggleAutoPlay();
+    visitedMonths.add(m);
+    document.getElementById('monthSelect').value = m;
+    updateAll(m);
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!isDragging) return;
+    const m = getMonthFromX(e.clientX);
+    visitedMonths.add(m);
+    document.getElementById('monthSelect').value = m;
+    updateAll(m);
+  });
+
+  document.addEventListener('mouseup', function() {
+    isDragging = false;
+  });
+})();
 
 // ==================== 初始化 ====================
 updateAll('all');
