@@ -1,0 +1,481 @@
+﻿PULocationID,DOLocationID,count,PU_Zone,DO_Zone,company,month
+264,264,7294,,,yellow,1
+237,236,3089,Upper East Side South,Upper East Side North,yellow,1
+236,236,2828,Upper East Side North,Upper East Side North,yellow,1
+236,237,2634,Upper East Side North,Upper East Side South,yellow,1
+237,237,2321,Upper East Side South,Upper East Side South,yellow,1
+239,238,1555,Upper West Side South,Upper West Side North,yellow,1
+239,142,1468,Upper West Side South,Lincoln Square East,yellow,1
+142,239,1378,Lincoln Square East,Upper West Side South,yellow,1
+238,239,1366,Upper West Side North,Upper West Side South,yellow,1
+141,236,1323,Lenox Hill West,Upper East Side North,yellow,1
+237,162,1278,Upper East Side South,Midtown East,yellow,1
+161,237,1252,Midtown Center,Upper East Side South,yellow,1
+186,230,1197,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,1
+237,161,1193,Upper East Side South,Midtown Center,yellow,1
+263,236,1188,Yorkville West,Upper East Side North,yellow,1
+230,186,1186,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,1
+141,237,1118,Lenox Hill West,Upper East Side South,yellow,1
+239,239,1108,Upper West Side South,Upper West Side South,yellow,1
+186,161,1103,Penn Station/Madison Sq West,Midtown Center,yellow,1
+237,141,1098,Upper East Side South,Lenox Hill West,yellow,1
+264,264,6221,,,yellow,2
+237,236,2947,Upper East Side South,Upper East Side North,yellow,2
+236,236,2691,Upper East Side North,Upper East Side North,yellow,2
+236,237,2555,Upper East Side North,Upper East Side South,yellow,2
+237,237,2182,Upper East Side South,Upper East Side South,yellow,2
+239,238,1540,Upper West Side South,Upper West Side North,yellow,2
+142,239,1414,Lincoln Square East,Upper West Side South,yellow,2
+239,142,1362,Upper West Side South,Lincoln Square East,yellow,2
+238,239,1333,Upper West Side North,Upper West Side South,yellow,2
+141,236,1227,Lenox Hill West,Upper East Side North,yellow,2
+237,162,1221,Upper East Side South,Midtown East,yellow,2
+161,237,1200,Midtown Center,Upper East Side South,yellow,2
+230,186,1193,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,2
+237,161,1164,Upper East Side South,Midtown Center,yellow,2
+186,230,1149,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,2
+234,170,1100,Union Sq,Murray Hill,yellow,2
+186,161,1077,Penn Station/Madison Sq West,Midtown Center,yellow,2
+79,79,1072,East Village,East Village,yellow,2
+237,141,1069,Upper East Side South,Lenox Hill West,yellow,2
+239,239,1068,Upper West Side South,Upper West Side South,yellow,2
+264,264,6718,,,yellow,3
+237,236,2713,Upper East Side South,Upper East Side North,yellow,3
+236,236,2396,Upper East Side North,Upper East Side North,yellow,3
+236,237,2326,Upper East Side North,Upper East Side South,yellow,3
+237,237,2041,Upper East Side South,Upper East Side South,yellow,3
+239,238,1394,Upper West Side South,Upper West Side North,yellow,3
+239,142,1385,Upper West Side South,Lincoln Square East,yellow,3
+237,162,1267,Upper East Side South,Midtown East,yellow,3
+142,239,1240,Lincoln Square East,Upper West Side South,yellow,3
+238,239,1204,Upper West Side North,Upper West Side South,yellow,3
+237,161,1185,Upper East Side South,Midtown Center,yellow,3
+161,237,1172,Midtown Center,Upper East Side South,yellow,3
+230,186,1168,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,3
+141,236,1162,Lenox Hill West,Upper East Side North,yellow,3
+186,230,1125,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,3
+234,170,1086,Union Sq,Murray Hill,yellow,3
+79,79,1084,East Village,East Village,yellow,3
+239,239,1074,Upper West Side South,Upper West Side South,yellow,3
+186,161,1071,Penn Station/Madison Sq West,Midtown Center,yellow,3
+263,236,1068,Yorkville West,Upper East Side North,yellow,3
+264,264,6367,,,yellow,4
+237,236,2989,Upper East Side South,Upper East Side North,yellow,4
+236,236,2505,Upper East Side North,Upper East Side North,yellow,4
+236,237,2480,Upper East Side North,Upper East Side South,yellow,4
+237,237,2362,Upper East Side South,Upper East Side South,yellow,4
+239,142,1397,Upper West Side South,Lincoln Square East,yellow,4
+239,238,1374,Upper West Side South,Upper West Side North,yellow,4
+142,239,1300,Lincoln Square East,Upper West Side South,yellow,4
+237,161,1285,Upper East Side South,Midtown Center,yellow,4
+237,162,1268,Upper East Side South,Midtown East,yellow,4
+161,237,1192,Midtown Center,Upper East Side South,yellow,4
+186,230,1159,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,4
+238,239,1150,Upper West Side North,Upper West Side South,yellow,4
+141,236,1129,Lenox Hill West,Upper East Side North,yellow,4
+263,236,1115,Yorkville West,Upper East Side North,yellow,4
+230,186,1114,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,4
+186,161,1086,Penn Station/Madison Sq West,Midtown Center,yellow,4
+239,239,1023,Upper West Side South,Upper West Side South,yellow,4
+237,141,1021,Upper East Side South,Lenox Hill West,yellow,4
+107,170,998,Gramercy,Murray Hill,yellow,4
+264,264,5211,,,yellow,5
+237,236,3288,Upper East Side South,Upper East Side North,yellow,5
+236,237,2832,Upper East Side North,Upper East Side South,yellow,5
+236,236,2573,Upper East Side North,Upper East Side North,yellow,5
+237,237,2467,Upper East Side South,Upper East Side South,yellow,5
+237,161,1384,Upper East Side South,Midtown Center,yellow,5
+239,142,1356,Upper West Side South,Lincoln Square East,yellow,5
+142,239,1345,Lincoln Square East,Upper West Side South,yellow,5
+237,162,1345,Upper East Side South,Midtown East,yellow,5
+239,238,1316,Upper West Side South,Upper West Side North,yellow,5
+238,239,1261,Upper West Side North,Upper West Side South,yellow,5
+161,237,1244,Midtown Center,Upper East Side South,yellow,5
+141,236,1137,Lenox Hill West,Upper East Side North,yellow,5
+186,161,1107,Penn Station/Madison Sq West,Midtown Center,yellow,5
+186,230,1081,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,5
+263,236,1055,Yorkville West,Upper East Side North,yellow,5
+230,186,1050,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,5
+107,170,1021,Gramercy,Murray Hill,yellow,5
+48,68,993,Clinton East,East Chelsea,yellow,5
+236,141,989,Upper East Side North,Lenox Hill West,yellow,5
+264,264,5451,,,yellow,6
+237,236,2782,Upper East Side South,Upper East Side North,yellow,6
+236,237,2450,Upper East Side North,Upper East Side South,yellow,6
+236,236,2250,Upper East Side North,Upper East Side North,yellow,6
+237,237,2211,Upper East Side South,Upper East Side South,yellow,6
+239,142,1438,Upper West Side South,Lincoln Square East,yellow,6
+237,162,1427,Upper East Side South,Midtown East,yellow,6
+239,238,1322,Upper West Side South,Upper West Side North,yellow,6
+142,239,1308,Lincoln Square East,Upper West Side South,yellow,6
+237,161,1266,Upper East Side South,Midtown Center,yellow,6
+238,239,1180,Upper West Side North,Upper West Side South,yellow,6
+107,170,1158,Gramercy,Murray Hill,yellow,6
+141,236,1149,Lenox Hill West,Upper East Side North,yellow,6
+161,237,1103,Midtown Center,Upper East Side South,yellow,6
+186,161,1081,Penn Station/Madison Sq West,Midtown Center,yellow,6
+230,186,1066,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,6
+234,170,1065,Union Sq,Murray Hill,yellow,6
+263,236,1052,Yorkville West,Upper East Side North,yellow,6
+186,230,1051,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,6
+48,68,999,Clinton East,East Chelsea,yellow,6
+264,264,5673,,,yellow,7
+237,236,2195,Upper East Side South,Upper East Side North,yellow,7
+236,237,1859,Upper East Side North,Upper East Side South,yellow,7
+237,237,1854,Upper East Side South,Upper East Side South,yellow,7
+236,236,1631,Upper East Side North,Upper East Side North,yellow,7
+237,162,1401,Upper East Side South,Midtown East,yellow,7
+239,142,1301,Upper West Side South,Lincoln Square East,yellow,7
+239,238,1233,Upper West Side South,Upper West Side North,yellow,7
+186,161,1207,Penn Station/Madison Sq West,Midtown Center,yellow,7
+230,186,1198,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,7
+237,161,1196,Upper East Side South,Midtown Center,yellow,7
+161,237,1156,Midtown Center,Upper East Side South,yellow,7
+186,230,1132,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,7
+107,170,1114,Gramercy,Murray Hill,yellow,7
+142,239,1104,Lincoln Square East,Upper West Side South,yellow,7
+48,48,1087,Clinton East,Clinton East,yellow,7
+186,170,1055,Penn Station/Madison Sq West,Murray Hill,yellow,7
+162,170,1041,Midtown East,Murray Hill,yellow,7
+234,170,1039,Union Sq,Murray Hill,yellow,7
+238,239,1033,Upper West Side North,Upper West Side South,yellow,7
+264,264,5112,,,yellow,8
+237,236,2176,Upper East Side South,Upper East Side North,yellow,8
+236,237,1975,Upper East Side North,Upper East Side South,yellow,8
+237,237,1874,Upper East Side South,Upper East Side South,yellow,8
+236,236,1669,Upper East Side North,Upper East Side North,yellow,8
+186,161,1326,Penn Station/Madison Sq West,Midtown Center,yellow,8
+237,162,1280,Upper East Side South,Midtown East,yellow,8
+239,142,1274,Upper West Side South,Lincoln Square East,yellow,8
+237,161,1236,Upper East Side South,Midtown Center,yellow,8
+107,170,1209,Gramercy,Murray Hill,yellow,8
+161,237,1195,Midtown Center,Upper East Side South,yellow,8
+186,230,1192,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,8
+239,238,1176,Upper West Side South,Upper West Side North,yellow,8
+230,186,1175,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,8
+234,170,1143,Union Sq,Murray Hill,yellow,8
+142,239,1141,Lincoln Square East,Upper West Side South,yellow,8
+186,170,1056,Penn Station/Madison Sq West,Murray Hill,yellow,8
+161,161,1045,Midtown Center,Midtown Center,yellow,8
+100,161,1034,Garment District,Midtown Center,yellow,8
+161,164,1031,Midtown Center,Midtown South,yellow,8
+264,264,5049,,,yellow,9
+237,236,3134,Upper East Side South,Upper East Side North,yellow,9
+236,237,2680,Upper East Side North,Upper East Side South,yellow,9
+236,236,2460,Upper East Side North,Upper East Side North,yellow,9
+237,237,2427,Upper East Side South,Upper East Side South,yellow,9
+239,238,1438,Upper West Side South,Upper West Side North,yellow,9
+239,142,1421,Upper West Side South,Lincoln Square East,yellow,9
+237,162,1365,Upper East Side South,Midtown East,yellow,9
+142,239,1272,Lincoln Square East,Upper West Side South,yellow,9
+238,239,1252,Upper West Side North,Upper West Side South,yellow,9
+141,236,1246,Lenox Hill West,Upper East Side North,yellow,9
+186,161,1094,Penn Station/Madison Sq West,Midtown Center,yellow,9
+141,237,1087,Lenox Hill West,Upper East Side South,yellow,9
+237,141,1083,Upper East Side South,Lenox Hill West,yellow,9
+234,170,1082,Union Sq,Murray Hill,yellow,9
+186,230,1081,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,9
+263,141,1076,Yorkville West,Lenox Hill West,yellow,9
+263,236,1057,Yorkville West,Upper East Side North,yellow,9
+237,161,1056,Upper East Side South,Midtown Center,yellow,9
+230,186,1055,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,9
+264,264,6474,,,yellow,10
+237,236,3398,Upper East Side South,Upper East Side North,yellow,10
+236,237,2910,Upper East Side North,Upper East Side South,yellow,10
+236,236,2613,Upper East Side North,Upper East Side North,yellow,10
+237,237,2504,Upper East Side South,Upper East Side South,yellow,10
+239,238,1526,Upper West Side South,Upper West Side North,yellow,10
+237,162,1400,Upper East Side South,Midtown East,yellow,10
+239,142,1376,Upper West Side South,Lincoln Square East,yellow,10
+142,239,1332,Lincoln Square East,Upper West Side South,yellow,10
+237,161,1297,Upper East Side South,Midtown Center,yellow,10
+161,237,1261,Midtown Center,Upper East Side South,yellow,10
+238,239,1259,Upper West Side North,Upper West Side South,yellow,10
+141,236,1227,Lenox Hill West,Upper East Side North,yellow,10
+263,236,1134,Yorkville West,Upper East Side North,yellow,10
+141,237,1119,Lenox Hill West,Upper East Side South,yellow,10
+186,161,1097,Penn Station/Madison Sq West,Midtown Center,yellow,10
+237,141,1053,Upper East Side South,Lenox Hill West,yellow,10
+107,170,1050,Gramercy,Murray Hill,yellow,10
+236,141,1050,Upper East Side North,Lenox Hill West,yellow,10
+186,230,1048,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,10
+264,264,7229,,,yellow,11
+237,236,3425,Upper East Side South,Upper East Side North,yellow,11
+236,236,2877,Upper East Side North,Upper East Side North,yellow,11
+236,237,2798,Upper East Side North,Upper East Side South,yellow,11
+237,237,2606,Upper East Side South,Upper East Side South,yellow,11
+239,238,1595,Upper West Side South,Upper West Side North,yellow,11
+239,142,1505,Upper West Side South,Lincoln Square East,yellow,11
+142,239,1460,Lincoln Square East,Upper West Side South,yellow,11
+237,162,1375,Upper East Side South,Midtown East,yellow,11
+238,239,1298,Upper West Side North,Upper West Side South,yellow,11
+141,236,1292,Lenox Hill West,Upper East Side North,yellow,11
+237,161,1249,Upper East Side South,Midtown Center,yellow,11
+237,141,1212,Upper East Side South,Lenox Hill West,yellow,11
+161,237,1187,Midtown Center,Upper East Side South,yellow,11
+186,230,1181,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,11
+263,236,1178,Yorkville West,Upper East Side North,yellow,11
+230,186,1173,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,11
+141,237,1153,Lenox Hill West,Upper East Side South,yellow,11
+239,239,1147,Upper West Side South,Upper West Side South,yellow,11
+186,161,1146,Penn Station/Madison Sq West,Midtown Center,yellow,11
+264,264,7861,,,yellow,12
+237,236,3459,Upper East Side South,Upper East Side North,yellow,12
+236,237,2918,Upper East Side North,Upper East Side South,yellow,12
+236,236,2819,Upper East Side North,Upper East Side North,yellow,12
+237,237,2694,Upper East Side South,Upper East Side South,yellow,12
+239,238,1630,Upper West Side South,Upper West Side North,yellow,12
+239,142,1564,Upper West Side South,Lincoln Square East,yellow,12
+142,239,1490,Lincoln Square East,Upper West Side South,yellow,12
+186,230,1454,Penn Station/Madison Sq West,Times Sq/Theatre District,yellow,12
+237,162,1385,Upper East Side South,Midtown East,yellow,12
+238,239,1367,Upper West Side North,Upper West Side South,yellow,12
+230,186,1295,Times Sq/Theatre District,Penn Station/Madison Sq West,yellow,12
+141,236,1266,Lenox Hill West,Upper East Side North,yellow,12
+237,141,1240,Upper East Side South,Lenox Hill West,yellow,12
+186,161,1225,Penn Station/Madison Sq West,Midtown Center,yellow,12
+237,161,1196,Upper East Side South,Midtown Center,yellow,12
+263,236,1150,Yorkville West,Upper East Side North,yellow,12
+239,239,1132,Upper West Side South,Upper West Side South,yellow,12
+48,48,1126,Clinton East,Clinton East,yellow,12
+142,238,1114,Lincoln Square East,Upper West Side North,yellow,12
+7,7,7251,Astoria,Astoria,green,1
+75,74,5441,East Harlem South,East Harlem North,green,1
+41,42,5166,Central Harlem,Central Harlem North,green,1
+95,95,4448,Forest Hills,Forest Hills,green,1
+74,75,4386,East Harlem North,East Harlem South,green,1
+82,129,4293,Elmhurst,Jackson Heights,green,1
+181,181,4191,Park Slope,Park Slope,green,1
+129,129,4097,Jackson Heights,Jackson Heights,green,1
+223,223,3890,Steinway,Steinway,green,1
+82,82,3578,Elmhurst,Elmhurst,green,1
+41,41,3575,Central Harlem,Central Harlem,green,1
+41,74,3538,Central Harlem,East Harlem North,green,1
+42,42,3419,Central Harlem North,Central Harlem North,green,1
+74,41,3394,East Harlem North,Central Harlem,green,1
+7,223,3375,Astoria,Steinway,green,1
+74,74,3294,East Harlem North,East Harlem North,green,1
+255,112,3218,Williamsburg (North Side),Greenpoint,green,1
+75,75,3111,East Harlem South,East Harlem South,green,1
+42,41,2707,Central Harlem North,Central Harlem,green,1
+74,42,2689,East Harlem North,Central Harlem North,green,1
+7,7,7167,Astoria,Astoria,green,2
+75,74,5320,East Harlem South,East Harlem North,green,2
+41,42,5109,Central Harlem,Central Harlem North,green,2
+74,75,4138,East Harlem North,East Harlem South,green,2
+82,129,3992,Elmhurst,Jackson Heights,green,2
+95,95,3986,Forest Hills,Forest Hills,green,2
+181,181,3916,Park Slope,Park Slope,green,2
+41,74,3760,Central Harlem,East Harlem North,green,2
+129,129,3681,Jackson Heights,Jackson Heights,green,2
+41,41,3610,Central Harlem,Central Harlem,green,2
+42,42,3449,Central Harlem North,Central Harlem North,green,2
+74,41,3410,East Harlem North,Central Harlem,green,2
+223,223,3403,Steinway,Steinway,green,2
+82,82,3305,Elmhurst,Elmhurst,green,2
+74,74,3164,East Harlem North,East Harlem North,green,2
+75,75,3051,East Harlem South,East Harlem South,green,2
+7,223,3025,Astoria,Steinway,green,2
+255,112,2978,Williamsburg (North Side),Greenpoint,green,2
+42,41,2904,Central Harlem North,Central Harlem,green,2
+166,166,2873,Morningside Heights,Morningside Heights,green,2
+7,7,7238,Astoria,Astoria,green,3
+75,74,5691,East Harlem South,East Harlem North,green,3
+41,42,5360,Central Harlem,Central Harlem North,green,3
+74,75,4339,East Harlem North,East Harlem South,green,3
+82,129,4036,Elmhurst,Jackson Heights,green,3
+95,95,4000,Forest Hills,Forest Hills,green,3
+129,129,3914,Jackson Heights,Jackson Heights,green,3
+41,74,3729,Central Harlem,East Harlem North,green,3
+41,41,3586,Central Harlem,Central Harlem,green,3
+42,42,3582,Central Harlem North,Central Harlem North,green,3
+181,181,3559,Park Slope,Park Slope,green,3
+74,74,3399,East Harlem North,East Harlem North,green,3
+74,41,3338,East Harlem North,Central Harlem,green,3
+223,223,3272,Steinway,Steinway,green,3
+7,223,3234,Astoria,Steinway,green,3
+75,75,3151,East Harlem South,East Harlem South,green,3
+82,82,3046,Elmhurst,Elmhurst,green,3
+42,41,2935,Central Harlem North,Central Harlem,green,3
+74,42,2905,East Harlem North,Central Harlem North,green,3
+255,112,2811,Williamsburg (North Side),Greenpoint,green,3
+7,7,6621,Astoria,Astoria,green,4
+75,74,5292,East Harlem South,East Harlem North,green,4
+41,42,5206,Central Harlem,Central Harlem North,green,4
+74,75,4176,East Harlem North,East Harlem South,green,4
+82,129,3875,Elmhurst,Jackson Heights,green,4
+95,95,3786,Forest Hills,Forest Hills,green,4
+129,129,3682,Jackson Heights,Jackson Heights,green,4
+41,41,3518,Central Harlem,Central Harlem,green,4
+41,74,3461,Central Harlem,East Harlem North,green,4
+42,42,3331,Central Harlem North,Central Harlem North,green,4
+181,181,3221,Park Slope,Park Slope,green,4
+74,41,3217,East Harlem North,Central Harlem,green,4
+74,74,3097,East Harlem North,East Harlem North,green,4
+7,223,3066,Astoria,Steinway,green,4
+223,223,3011,Steinway,Steinway,green,4
+75,75,2904,East Harlem South,East Harlem South,green,4
+82,82,2882,Elmhurst,Elmhurst,green,4
+255,112,2740,Williamsburg (North Side),Greenpoint,green,4
+74,42,2722,East Harlem North,Central Harlem North,green,4
+42,41,2709,Central Harlem North,Central Harlem,green,4
+7,7,6356,Astoria,Astoria,green,5
+75,74,5479,East Harlem South,East Harlem North,green,5
+41,42,4587,Central Harlem,Central Harlem North,green,5
+95,95,3985,Forest Hills,Forest Hills,green,5
+74,75,3904,East Harlem North,East Harlem South,green,5
+82,129,3904,Elmhurst,Jackson Heights,green,5
+129,129,3888,Jackson Heights,Jackson Heights,green,5
+82,82,3329,Elmhurst,Elmhurst,green,5
+41,74,3233,Central Harlem,East Harlem North,green,5
+41,41,3164,Central Harlem,Central Harlem,green,5
+74,41,3152,East Harlem North,Central Harlem,green,5
+42,42,3054,Central Harlem North,Central Harlem North,green,5
+181,181,2941,Park Slope,Park Slope,green,5
+74,74,2913,East Harlem North,East Harlem North,green,5
+223,223,2878,Steinway,Steinway,green,5
+7,223,2875,Astoria,Steinway,green,5
+75,75,2757,East Harlem South,East Harlem South,green,5
+74,42,2590,East Harlem North,Central Harlem North,green,5
+42,41,2551,Central Harlem North,Central Harlem,green,5
+7,179,2477,Astoria,Old Astoria,green,5
+7,7,6206,Astoria,Astoria,green,6
+75,74,5485,East Harlem South,East Harlem North,green,6
+41,42,4721,Central Harlem,Central Harlem North,green,6
+74,75,4096,East Harlem North,East Harlem South,green,6
+129,129,3890,Jackson Heights,Jackson Heights,green,6
+82,129,3745,Elmhurst,Jackson Heights,green,6
+95,95,3745,Forest Hills,Forest Hills,green,6
+41,74,3294,Central Harlem,East Harlem North,green,6
+82,82,3253,Elmhurst,Elmhurst,green,6
+41,41,3238,Central Harlem,Central Harlem,green,6
+74,41,3164,East Harlem North,Central Harlem,green,6
+42,42,3142,Central Harlem North,Central Harlem North,green,6
+7,223,3118,Astoria,Steinway,green,6
+74,74,2954,East Harlem North,East Harlem North,green,6
+181,181,2923,Park Slope,Park Slope,green,6
+75,75,2757,East Harlem South,East Harlem South,green,6
+223,223,2627,Steinway,Steinway,green,6
+42,41,2563,Central Harlem North,Central Harlem,green,6
+74,42,2493,East Harlem North,Central Harlem North,green,6
+7,179,2389,Astoria,Old Astoria,green,6
+7,7,6192,Astoria,Astoria,green,7
+75,74,5356,East Harlem South,East Harlem North,green,7
+41,42,5169,Central Harlem,Central Harlem North,green,7
+74,75,4477,East Harlem North,East Harlem South,green,7
+82,129,4062,Elmhurst,Jackson Heights,green,7
+129,129,3842,Jackson Heights,Jackson Heights,green,7
+95,95,3527,Forest Hills,Forest Hills,green,7
+41,74,3524,Central Harlem,East Harlem North,green,7
+82,82,3411,Elmhurst,Elmhurst,green,7
+41,41,3410,Central Harlem,Central Harlem,green,7
+42,42,3220,Central Harlem North,Central Harlem North,green,7
+74,41,3190,East Harlem North,Central Harlem,green,7
+7,223,2998,Astoria,Steinway,green,7
+74,74,2982,East Harlem North,East Harlem North,green,7
+181,181,2800,Park Slope,Park Slope,green,7
+75,75,2781,East Harlem South,East Harlem South,green,7
+42,41,2679,Central Harlem North,Central Harlem,green,7
+74,42,2593,East Harlem North,Central Harlem North,green,7
+223,223,2300,Steinway,Steinway,green,7
+74,236,2200,East Harlem North,Upper East Side North,green,7
+7,7,5983,Astoria,Astoria,green,8
+75,74,5584,East Harlem South,East Harlem North,green,8
+41,42,4883,Central Harlem,Central Harlem North,green,8
+74,75,4488,East Harlem North,East Harlem South,green,8
+82,129,3934,Elmhurst,Jackson Heights,green,8
+129,129,3816,Jackson Heights,Jackson Heights,green,8
+82,82,3640,Elmhurst,Elmhurst,green,8
+95,95,3605,Forest Hills,Forest Hills,green,8
+41,41,3340,Central Harlem,Central Harlem,green,8
+41,74,3339,Central Harlem,East Harlem North,green,8
+42,42,3272,Central Harlem North,Central Harlem North,green,8
+74,41,3178,East Harlem North,Central Harlem,green,8
+74,74,3073,East Harlem North,East Harlem North,green,8
+75,75,2941,East Harlem South,East Harlem South,green,8
+7,223,2820,Astoria,Steinway,green,8
+74,42,2738,East Harlem North,Central Harlem North,green,8
+42,41,2576,Central Harlem North,Central Harlem,green,8
+223,223,2446,Steinway,Steinway,green,8
+181,181,2341,Park Slope,Park Slope,green,8
+7,179,2055,Astoria,Old Astoria,green,8
+7,7,5615,Astoria,Astoria,green,9
+75,74,5332,East Harlem South,East Harlem North,green,9
+41,42,4702,Central Harlem,Central Harlem North,green,9
+74,75,4191,East Harlem North,East Harlem South,green,9
+82,129,3964,Elmhurst,Jackson Heights,green,9
+129,129,3876,Jackson Heights,Jackson Heights,green,9
+95,95,3472,Forest Hills,Forest Hills,green,9
+41,74,3290,Central Harlem,East Harlem North,green,9
+74,41,3172,East Harlem North,Central Harlem,green,9
+41,41,3087,Central Harlem,Central Harlem,green,9
+42,42,3013,Central Harlem North,Central Harlem North,green,9
+82,82,2948,Elmhurst,Elmhurst,green,9
+7,223,2921,Astoria,Steinway,green,9
+74,74,2858,East Harlem North,East Harlem North,green,9
+75,75,2737,East Harlem South,East Harlem South,green,9
+181,181,2734,Park Slope,Park Slope,green,9
+74,42,2692,East Harlem North,Central Harlem North,green,9
+42,41,2576,Central Harlem North,Central Harlem,green,9
+223,223,2454,Steinway,Steinway,green,9
+74,236,2320,East Harlem North,Upper East Side North,green,9
+7,7,5703,Astoria,Astoria,green,10
+75,74,5378,East Harlem South,East Harlem North,green,10
+41,42,4262,Central Harlem,Central Harlem North,green,10
+74,75,4125,East Harlem North,East Harlem South,green,10
+82,129,4002,Elmhurst,Jackson Heights,green,10
+95,95,3852,Forest Hills,Forest Hills,green,10
+129,129,3563,Jackson Heights,Jackson Heights,green,10
+41,74,3256,Central Harlem,East Harlem North,green,10
+74,41,3137,East Harlem North,Central Harlem,green,10
+42,42,2964,Central Harlem North,Central Harlem North,green,10
+41,41,2959,Central Harlem,Central Harlem,green,10
+82,82,2955,Elmhurst,Elmhurst,green,10
+223,223,2916,Steinway,Steinway,green,10
+74,74,2800,East Harlem North,East Harlem North,green,10
+75,75,2784,East Harlem South,East Harlem South,green,10
+7,223,2760,Astoria,Steinway,green,10
+181,181,2693,Park Slope,Park Slope,green,10
+74,42,2522,East Harlem North,Central Harlem North,green,10
+42,41,2317,Central Harlem North,Central Harlem,green,10
+74,236,2249,East Harlem North,Upper East Side North,green,10
+7,7,6011,Astoria,Astoria,green,11
+75,74,5302,East Harlem South,East Harlem North,green,11
+41,42,4410,Central Harlem,Central Harlem North,green,11
+82,129,4234,Elmhurst,Jackson Heights,green,11
+95,95,4199,Forest Hills,Forest Hills,green,11
+74,75,4167,East Harlem North,East Harlem South,green,11
+129,129,3862,Jackson Heights,Jackson Heights,green,11
+82,82,3391,Elmhurst,Elmhurst,green,11
+41,74,3331,Central Harlem,East Harlem North,green,11
+223,223,3186,Steinway,Steinway,green,11
+74,41,3175,East Harlem North,Central Harlem,green,11
+41,41,3173,Central Harlem,Central Harlem,green,11
+42,42,3024,Central Harlem North,Central Harlem North,green,11
+74,74,2990,East Harlem North,East Harlem North,green,11
+7,223,2881,Astoria,Steinway,green,11
+75,75,2785,East Harlem South,East Harlem South,green,11
+181,181,2740,Park Slope,Park Slope,green,11
+74,42,2455,East Harlem North,Central Harlem North,green,11
+42,41,2406,Central Harlem North,Central Harlem,green,11
+74,236,2224,East Harlem North,Upper East Side North,green,11
+7,7,6222,Astoria,Astoria,green,12
+75,74,5233,East Harlem South,East Harlem North,green,12
+41,42,4770,Central Harlem,Central Harlem North,green,12
+82,129,4374,Elmhurst,Jackson Heights,green,12
+74,75,4178,East Harlem North,East Harlem South,green,12
+95,95,4096,Forest Hills,Forest Hills,green,12
+129,129,3880,Jackson Heights,Jackson Heights,green,12
+41,74,3463,Central Harlem,East Harlem North,green,12
+41,41,3424,Central Harlem,Central Harlem,green,12
+74,41,3370,East Harlem North,Central Harlem,green,12
+82,82,3147,Elmhurst,Elmhurst,green,12
+42,42,3139,Central Harlem North,Central Harlem North,green,12
+74,74,3011,East Harlem North,East Harlem North,green,12
+7,223,2992,Astoria,Steinway,green,12
+223,223,2772,Steinway,Steinway,green,12
+181,181,2767,Park Slope,Park Slope,green,12
+75,75,2724,East Harlem South,East Harlem South,green,12
+74,42,2672,East Harlem North,Central Harlem North,green,12
+42,41,2523,Central Harlem North,Central Harlem,green,12
+7,179,2378,Astoria,Old Astoria,green,12
