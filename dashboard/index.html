@@ -3,173 +3,287 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>纽约市出租车数据可视化大屏 2018</title>
+<title>纽约市出租车数据可视化大屏 2018 - 3D版</title>
 <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
     background: #0a0e27;
     color: #e0e6ff;
     font-family: 'Microsoft YaHei', 'PingFang SC', sans-serif;
-    overflow-x: hidden;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100vh;
+    min-width: 1400px;
   }
-  /* 主网格布局 */
+  /* 主网格布局 - 中间留出3D区域 */
   .dashboard {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: auto auto 1fr 1fr 1fr;
-    gap: 10px;
-    padding: 10px;
+    grid-template-columns: 1.1fr 1.1fr 1.4fr 1.1fr 1.1fr;
+    grid-template-rows: 70px 100px 1fr 1fr;
+    gap: 12px;
+    padding: 12px;
     height: 100vh;
-    min-width: 1200px;
   }
   /* 标题栏 */
   .header {
-    grid-column: 1 / 5;
+    grid-column: 1 / 6;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 10px 20px;
+    padding: 10px 25px;
     background: linear-gradient(135deg, #111633 0%, #0d1230 100%);
     border: 1px solid #1a2050;
-    border-radius: 8px;
+    border-radius: 10px;
     position: relative;
   }
   .header::before {
     content: '';
     position: absolute;
     top: -1px; left: -1px; right: -1px; bottom: -1px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #3a5fff33, #00d4ff33, #3a5fff33);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3a5fff44, #00d4ff44, #ffd70044);
     z-index: -1;
-    filter: blur(1px);
+    filter: blur(2px);
+    animation: glow 3s ease-in-out infinite alternate;
+  }
+  @keyframes glow {
+    from { opacity: 0.5; }
+    to { opacity: 1; }
   }
   .header h1 {
-    font-size: 24px;
-    background: linear-gradient(90deg, #00d4ff, #3a5fff, #00d4ff);
+    font-size: 26px;
+    background: linear-gradient(90deg, #00d4ff, #3a5fff, #ffd700, #3a5fff, #00d4ff);
+    background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
     letter-spacing: 3px;
+    animation: shine 3s linear infinite;
+  }
+  @keyframes shine {
+    to { background-position: 200% center; }
   }
   .header-controls {
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 18px;
   }
   .header-controls label {
-    font-size: 13px;
+    font-size: 14px;
     color: #8892b0;
   }
   .header-controls select {
     background: #1a2050;
     color: #e0e6ff;
-    border: 1px solid #2a3070;
-    border-radius: 4px;
-    padding: 4px 10px;
-    font-size: 13px;
+    border: 1px solid #3a5fff;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 14px;
     outline: none;
     cursor: pointer;
+    transition: all 0.3s;
   }
-  .header-controls select:focus {
-    border-color: #3a5fff;
+  .header-controls select:hover, .header-controls select:focus {
+    border-color: #00d4ff;
+    box-shadow: 0 0 15px #00d4ff33;
   }
   .btn-auto {
     background: linear-gradient(135deg, #1a2050, #2a3070);
     color: #00d4ff;
     border: 1px solid #3a5fff;
-    border-radius: 4px;
-    padding: 5px 14px;
-    font-size: 13px;
+    border-radius: 6px;
+    padding: 7px 18px;
+    font-size: 14px;
     cursor: pointer;
     transition: all 0.3s;
   }
-  .btn-auto:hover { background: #2a3070; }
-  .btn-auto.playing { background: #3a5fff; color: #fff; }
+  .btn-auto:hover { 
+    background: linear-gradient(135deg, #2a3070, #3a5fff);
+    box-shadow: 0 0 20px #3a5fff55;
+  }
+  .btn-auto.playing { 
+    background: linear-gradient(135deg, #3a5fff, #00d4ff);
+    color: #fff;
+    box-shadow: 0 0 25px #00d4ff55;
+  }
   .clock {
-    font-size: 18px;
+    font-size: 20px;
     font-family: 'Courier New', monospace;
     color: #00d4ff;
-    text-shadow: 0 0 10px #00d4ff55;
+    text-shadow: 0 0 15px #00d4ff66;
+    background: rgba(26, 32, 80, 0.5);
+    padding: 5px 15px;
+    border-radius: 6px;
+    border: 1px solid #2a3070;
   }
   /* 指标卡片 */
   .kpi-row {
-    grid-column: 1 / 5;
+    grid-column: 1 / 6;
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
   }
   .kpi-card {
     background: linear-gradient(135deg, #111633, #161b3d);
     border: 1px solid #1a2050;
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 15px 20px;
     text-align: center;
     position: relative;
     overflow: hidden;
+    transition: all 0.3s;
+  }
+  .kpi-card:hover {
+    transform: translateY(-3px);
+    border-color: #3a5fff;
+    box-shadow: 0 10px 30px #3a5fff22;
   }
   .kpi-card::after {
     content: '';
     position: absolute;
     top: 0; left: 0;
     width: 100%; height: 3px;
-    background: linear-gradient(90deg, transparent, #3a5fff, #00d4ff, transparent);
+    background: linear-gradient(90deg, transparent, #3a5fff, #00d4ff, #ffd700, transparent);
+    animation: shimmer 2s linear infinite;
+  }
+  @keyframes shimmer {
+    0% { transform: translateX(-100%); }
+    100% { transform: translateX(100%); }
   }
   .kpi-card .kpi-label {
     font-size: 13px;
     color: #8892b0;
     margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
   }
   .kpi-card .kpi-value {
-    font-size: 26px;
+    font-size: 28px;
     font-weight: bold;
     font-family: 'Courier New', monospace;
     color: #00d4ff;
-    text-shadow: 0 0 15px #00d4ff44;
+    text-shadow: 0 0 20px #00d4ff55;
   }
   .kpi-card .kpi-unit {
     font-size: 12px;
     color: #5a6490;
     margin-top: 4px;
   }
+  /* 3D汽车展示区 */
+  .car-3d-container {
+    grid-column: 3 / 4;
+    grid-row: 3 / 5;
+    background: linear-gradient(135deg, #0d1230 0%, #111633 50%, #0d1230 100%);
+    border: 2px solid #1a2050;
+    border-radius: 16px;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .car-3d-container::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: 
+      radial-gradient(circle at 30% 50%, #3a5fff15 0%, transparent 50%),
+      radial-gradient(circle at 70% 50%, #00d4ff15 0%, transparent 50%),
+      radial-gradient(circle at 50% 80%, #ffd70010 0%, transparent 40%);
+    pointer-events: none;
+  }
+  .car-3d-title {
+    padding: 12px 20px;
+    font-size: 14px;
+    color: #8892b0;
+    border-bottom: 1px solid #1a2050;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(17, 22, 51, 0.8);
+  }
+  .car-3d-title span:last-child {
+    font-size: 11px;
+    color: #5a6490;
+  }
+  #car3dCanvas {
+    flex: 1;
+    width: 100%;
+  }
+  .car-info {
+    padding: 15px 20px;
+    background: rgba(17, 22, 51, 0.9);
+    border-top: 1px solid #1a2050;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .car-info-item {
+    text-align: center;
+  }
+  .car-info-label {
+    font-size: 11px;
+    color: #5a6490;
+    margin-bottom: 4px;
+  }
+  .car-info-value {
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffd700;
+    font-family: 'Courier New', monospace;
+  }
   /* 图表容器 */
   .chart-box {
     background: linear-gradient(135deg, #111633, #0d1230);
     border: 1px solid #1a2050;
-    border-radius: 8px;
-    padding: 10px;
+    border-radius: 10px;
+    padding: 12px;
     position: relative;
     overflow: hidden;
     min-height: 0;
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .chart-box:hover {
+    border-color: #3a5fff;
+    box-shadow: 0 0 25px #3a5fff33;
+    transform: translateY(-2px);
   }
   .chart-box::before {
     content: '';
     position: absolute;
     top: -1px; left: -1px; right: -1px; bottom: -1px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, #3a5fff11, #00d4ff11);
+    border-radius: 10px;
+    background: linear-gradient(135deg, #3a5fff15, #00d4ff15);
     z-index: -1;
     pointer-events: none;
   }
   .chart-box .chart-title {
     font-size: 13px;
     color: #8892b0;
-    margin-bottom: 5px;
-    padding-left: 8px;
+    margin-bottom: 8px;
+    padding-left: 10px;
     border-left: 3px solid #3a5fff;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .chart-box .chart-hint {
+    font-size: 10px;
+    color: #5a6490;
+    font-weight: normal;
   }
   .chart-container {
     width: 100%;
-    height: calc(100% - 25px);
+    height: calc(100% - 30px);
   }
-  /* 模态框 */
+  /* 模态框样式 */
   .modal-overlay {
     display: none;
     position: fixed;
     top: 0; left: 0;
     width: 100%; height: 100%;
-    background: rgba(0,0,0,0.7);
+    background: rgba(0,0,0,0.85);
     z-index: 1000;
     justify-content: center;
     align-items: center;
@@ -182,7 +296,7 @@
     padding: 30px;
     min-width: 400px;
     max-width: 600px;
-    box-shadow: 0 0 40px #3a5fff33;
+    box-shadow: 0 0 50px #3a5fff44;
   }
   .modal h2 {
     color: #00d4ff;
@@ -195,36 +309,79 @@
     border: 1px solid #5a6490;
     color: #8892b0;
     border-radius: 4px;
-    padding: 3px 12px;
+    padding: 5px 15px;
     cursor: pointer;
     font-size: 14px;
+    transition: all 0.3s;
   }
-  .modal .modal-close:hover { border-color: #3a5fff; color: #00d4ff; }
-  .modal table {
-    width: 100%;
-    border-collapse: collapse;
+  .modal .modal-close:hover { 
+    border-color: #3a5fff; 
+    color: #00d4ff;
+    background: rgba(58, 95, 255, 0.1);
   }
-  .modal table th, .modal table td {
-    padding: 8px 12px;
-    text-align: left;
+  /* 双击放大模态框 */
+  .zoom-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    background: rgba(10,14,39,0.95);
+    z-index: 2000;
+    flex-direction: column;
+  }
+  .zoom-overlay.active { display: flex; }
+  .zoom-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    background: #111633;
     border-bottom: 1px solid #1a2050;
+  }
+  .zoom-header h2 {
+    color: #00d4ff;
+    font-size: 18px;
+    margin: 0;
+  }
+  .zoom-close {
+    background: linear-gradient(135deg, #1a2050, #2a3070);
+    color: #00d4ff;
+    border: 1px solid #3a5fff;
+    border-radius: 6px;
+    padding: 8px 22px;
     font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s;
   }
-  .modal table th { color: #8892b0; }
-  .modal table td { color: #e0e6ff; }
-  /* 数字滚动动画 */
-  @keyframes fadeInUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+  .zoom-close:hover {
+    background: linear-gradient(135deg, #3a5fff, #00d4ff);
+    color: #fff;
   }
-  .kpi-value { animation: fadeInUp 0.6s ease-out; }
+  .zoom-hint {
+    color: #8892b0;
+    font-size: 12px;
+    margin-right: 20px;
+  }
+  .zoom-content {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  .zoom-chart-container {
+    flex: 1;
+    background: linear-gradient(135deg, #111633, #0d1230);
+    border: 1px solid #1a2050;
+    border-radius: 12px;
+    padding: 15px;
+  }
 </style>
 </head>
 <body>
 <div class="dashboard">
   <!-- 标题栏 -->
   <div class="header">
-    <h1>纽约市出租车数据可视化大屏 2018</h1>
+    <h1>🚕 纽约市出租车数据可视化大屏 2018</h1>
     <div class="header-controls">
       <label>选择月份：</label>
       <select id="monthSelect">
@@ -242,7 +399,7 @@
         <option value="11">11月</option>
         <option value="12">12月</option>
       </select>
-      <button class="btn-auto" id="btnAuto" onclick="toggleAutoPlay()">自动播放</button>
+      <button class="btn-auto" id="btnAuto" onclick="toggleAutoPlay()">▶ 自动播放</button>
       <div class="clock" id="clock">00:00:00</div>
     </div>
   </div>
@@ -259,66 +416,142 @@
       <div class="kpi-value" id="kpiRevenue">$0</div>
       <div class="kpi-unit">美元</div>
     </div>
+    <div class="kpi-card" style="background: linear-gradient(135deg, #1a1a3e, #2a2060); border-color: #ffd700;">
+      <div class="kpi-label" style="color: #ffd700;">Yellow 出租车</div>
+      <div class="kpi-value" id="kpiYellow" style="color: #ffd700;">0</div>
+      <div class="kpi-unit">次</div>
+    </div>
+    <div class="kpi-card" style="background: linear-gradient(135deg, #0a2a1a, #0a4020); border-color: #00e676;">
+      <div class="kpi-label" style="color: #00e676;">Green 出租车</div>
+      <div class="kpi-value" id="kpiGreen" style="color: #00e676;">0</div>
+      <div class="kpi-unit">次</div>
+    </div>
     <div class="kpi-card">
       <div class="kpi-label">平均车费</div>
       <div class="kpi-value" id="kpiFare">$0.00</div>
       <div class="kpi-unit">美元/次</div>
     </div>
-    <div class="kpi-card">
-      <div class="kpi-label">平均时长</div>
-      <div class="kpi-value" id="kpiDuration">0.0</div>
-      <div class="kpi-unit">分钟/次</div>
+  </div>
+
+  <!-- 左侧图表列 -->
+  <div class="chart-box" style="grid-column: 1 / 2; grid-row: 3 / 4;" data-chart="trend" ondblclick="zoomChart('trend')">
+    <div class="chart-title">
+      📈 月度行程趋势
+      <span class="chart-hint">双击放大</span>
+    </div>
+    <div class="chart-container" id="chartTrend"></div>
+  </div>
+  
+  <div class="chart-box" style="grid-column: 1 / 2; grid-row: 4 / 5;" data-chart="borough" ondblclick="zoomChart('borough')">
+    <div class="chart-title">
+      🏙️ 行政区行程量
+      <span class="chart-hint">双击放大</span>
+    </div>
+    <div class="chart-container" id="chartBorough"></div>
+  </div>
+
+  <!-- 中间左侧图表 -->
+  <div class="chart-box" style="grid-column: 2 / 3; grid-row: 3 / 4;" data-chart="heatmap" ondblclick="zoomChart('heatmap')">
+    <div class="chart-title">
+      🔥 24小时热力图
+      <span class="chart-hint">双击放大</span>
+    </div>
+    <div class="chart-container" id="chartHeatmap"></div>
+  </div>
+  
+  <div class="chart-box" style="grid-column: 2 / 3; grid-row: 4 / 5;" data-chart="payment" ondblclick="zoomChart('payment')">
+    <div class="chart-title">
+      💳 支付方式分布
+      <span class="chart-hint">双击放大</span>
+    </div>
+    <div class="chart-container" id="chartPayment"></div>
+  </div>
+
+  <!-- 中间3D汽车展示区 -->
+  <div class="car-3d-container">
+    <div class="car-3d-title">
+      <span>🚖 3D 出租车展示</span>
+      <span>自动旋转中</span>
+    </div>
+    <canvas id="car3dCanvas"></canvas>
+    <div class="car-info">
+      <div class="car-info-item">
+        <div class="car-info-label">Yellow 占比</div>
+        <div class="car-info-value" id="carYellowPct">92.9%</div>
+      </div>
+      <div class="car-info-item">
+        <div class="car-info-label">Green 占比</div>
+        <div class="car-info-value" id="carGreenPct" style="color: #00e676;">7.1%</div>
+      </div>
+      <div class="car-info-item">
+        <div class="car-info-label">平均速度</div>
+        <div class="car-info-value" style="color: #00d4ff;">24.5 mph</div>
+      </div>
+      <div class="car-info-item">
+        <div class="car-info-label">服务区域</div>
+        <div class="car-info-value" style="color: #3a5fff;">NYC 5区</div>
+      </div>
     </div>
   </div>
 
-  <!-- 第3行：月度趋势 + 24小时热力图 -->
-  <div class="chart-box" style="grid-column: 1/3;">
-    <div class="chart-title">月度行程趋势（Yellow vs Green）</div>
-    <div class="chart-container" id="chartTrend"></div>
-  </div>
-  <div class="chart-box" style="grid-column: 3/5;">
-    <div class="chart-title">24小时行程热力图</div>
-    <div class="chart-container" id="chartHeatmap"></div>
-  </div>
-
-  <!-- 第4行：行政区 + 支付方式 + 相关性 -->
-  <div class="chart-box" style="grid-column: 1/2;">
-    <div class="chart-title">行政区行程量</div>
-    <div class="chart-container" id="chartBorough"></div>
-  </div>
-  <div class="chart-box" style="grid-column: 2/3;">
-    <div class="chart-title">支付方式分布</div>
-    <div class="chart-container" id="chartPayment"></div>
-  </div>
-  <div class="chart-box" style="grid-column: 3/5;">
-    <div class="chart-title">特征相关性热力图</div>
+  <!-- 中间右侧图表 -->
+  <div class="chart-box" style="grid-column: 4 / 5; grid-row: 3 / 4;" data-chart="correlation" ondblclick="zoomChart('correlation')">
+    <div class="chart-title">
+      🔗 特征相关性
+      <span class="chart-hint">双击放大</span>
+    </div>
     <div class="chart-container" id="chartCorrelation"></div>
   </div>
-
-  <!-- 第5行：聚类 + 热门路线 + 预测 -->
-  <div class="chart-box" style="grid-column: 1/2;">
-    <div class="chart-title">PCA聚类散点图</div>
+  
+  <div class="chart-box" style="grid-column: 4 / 5; grid-row: 4 / 5;" data-chart="cluster" ondblclick="zoomChart('cluster')">
+    <div class="chart-title">
+      🎯 PCA聚类分析
+      <span class="chart-hint">双击放大</span>
+    </div>
     <div class="chart-container" id="chartCluster"></div>
   </div>
-  <div class="chart-box" style="grid-column: 2/3;">
-    <div class="chart-title">热门路线 TOP10</div>
+
+  <!-- 右侧图表列 -->
+  <div class="chart-box" style="grid-column: 5 / 6; grid-row: 3 / 4;" data-chart="routes" ondblclick="zoomChart('routes')">
+    <div class="chart-title">
+      🛣️ 热门路线 TOP10
+      <span class="chart-hint">双击放大</span>
+    </div>
     <div class="chart-container" id="chartRoutes"></div>
   </div>
-  <div class="chart-box" style="grid-column: 3/5;">
-    <div class="chart-title">预测验证对比（实际值 vs 预测值）</div>
+  
+  <div class="chart-box" style="grid-column: 5 / 6; grid-row: 4 / 5;" data-chart="prediction" ondblclick="zoomChart('prediction')">
+    <div class="chart-title">
+      📊 预测验证对比
+      <span class="chart-hint">双击放大</span>
+    </div>
     <div class="chart-container" id="chartPrediction"></div>
   </div>
 </div>
 
-<!-- 模态框 -->
+<!-- 区域详情模态框 -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
   <div class="modal" onclick="event.stopPropagation()">
-    <button class="modal-close" onclick="closeModal()">关闭</button>
+    <button class="modal-close" onclick="closeModal()">✕ 关闭</button>
     <h2 id="modalTitle">区域详情</h2>
-    <table id="modalTable">
-      <thead><tr><th>指标</th><th>Yellow Taxi</th><th>Green Taxi</th></tr></thead>
+    <table id="modalTable" style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+      <thead><tr style="border-bottom: 2px solid #3a5fff;"><th style="padding: 10px; text-align: left; color: #8892b0;">指标</th><th style="padding: 10px; text-align: left; color: #ffd700;">Yellow Taxi</th><th style="padding: 10px; text-align: left; color: #00e676;">Green Taxi</th></tr></thead>
       <tbody id="modalBody"></tbody>
     </table>
+  </div>
+</div>
+
+<!-- 双击放大模态框 -->
+<div class="zoom-overlay" id="zoomOverlay">
+  <div class="zoom-header">
+    <h2 id="zoomTitle">图表详情</h2>
+    <div>
+      <span class="zoom-hint">按 ESC 键或点击关闭按钮退出</span>
+      <button class="zoom-close" onclick="closeZoom()">✕ 关闭</button>
+    </div>
+  </div>
+  <div class="zoom-content">
+    <div class="zoom-chart-container" id="zoomChartContainer"></div>
   </div>
 </div>
 
@@ -439,6 +672,195 @@ let currentMonth = 'all';
 let autoPlayTimer = null;
 let isAutoPlaying = false;
 let autoPlayIndex = 0;
+let zoomedChart = null;
+let zoomedChartType = null;
+
+// ==================== 3D汽车模型 ====================
+let scene, camera, renderer, carGroup;
+let is3DInitialized = false;
+
+function init3DCar() {
+  const canvas = document.getElementById('car3dCanvas');
+  const container = canvas.parentElement;
+  const width = container.clientWidth;
+  const height = container.clientHeight - 100; // 减去标题和信息的区域
+
+  // 场景
+  scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x0a0e27, 5, 20);
+
+  // 相机
+  camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+  camera.position.set(0, 3, 8);
+  camera.lookAt(0, 0, 0);
+
+  // 渲染器
+  renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+  renderer.setSize(width, height);
+  renderer.setPixelRatio(window.devicePixelRatio);
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+
+  // 灯光
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+  scene.add(ambientLight);
+
+  const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+  dirLight.position.set(5, 10, 5);
+  dirLight.castShadow = true;
+  dirLight.shadow.mapSize.width = 1024;
+  dirLight.shadow.mapSize.height = 1024;
+  scene.add(dirLight);
+
+  const pointLight1 = new THREE.PointLight(0x3a5fff, 0.5);
+  pointLight1.position.set(-5, 3, 0);
+  scene.add(pointLight1);
+
+  const pointLight2 = new THREE.PointLight(0x00d4ff, 0.5);
+  pointLight2.position.set(5, 3, 0);
+  scene.add(pointLight2);
+
+  // 创建汽车组
+  carGroup = new THREE.Group();
+
+  // 车身主体（黄色出租车风格）
+  const bodyGeometry = new THREE.BoxGeometry(2.2, 0.6, 4.5);
+  const bodyMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xffd700,
+    shininess: 100,
+    specular: 0x444444
+  });
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+  body.position.y = 0.6;
+  body.castShadow = true;
+  carGroup.add(body);
+
+  // 车顶
+  const roofGeometry = new THREE.BoxGeometry(1.8, 0.5, 2.5);
+  const roofMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xffd700,
+    shininess: 100
+  });
+  const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+  roof.position.set(0, 1.15, -0.3);
+  roof.castShadow = true;
+  carGroup.add(roof);
+
+  // 车窗
+  const windowGeometry = new THREE.BoxGeometry(1.82, 0.4, 2.52);
+  const windowMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x1a237e,
+    shininess: 200,
+    transparent: true,
+    opacity: 0.7
+  });
+  const windows = new THREE.Mesh(windowGeometry, windowMaterial);
+  windows.position.set(0, 1.15, -0.3);
+  carGroup.add(windows);
+
+  // 车轮
+  const wheelGeometry = new THREE.CylinderGeometry(0.35, 0.35, 0.3, 32);
+  const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x222222 });
+  const wheelPositions = [
+    [-1.1, 0.35, 1.4], [1.1, 0.35, 1.4],
+    [-1.1, 0.35, -1.4], [1.1, 0.35, -1.4]
+  ];
+  wheelPositions.forEach(pos => {
+    const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+    wheel.rotation.z = Math.PI / 2;
+    wheel.position.set(...pos);
+    wheel.castShadow = true;
+    carGroup.add(wheel);
+  });
+
+  // 车灯
+  const headlightGeometry = new THREE.BoxGeometry(0.4, 0.2, 0.1);
+  const headlightMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xffffff,
+    emissive: 0xffffff,
+    emissiveIntensity: 0.5
+  });
+  const headlight1 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+  headlight1.position.set(-0.6, 0.6, 2.26);
+  carGroup.add(headlight1);
+  const headlight2 = new THREE.Mesh(headlightGeometry, headlightMaterial);
+  headlight2.position.set(0.6, 0.6, 2.26);
+  carGroup.add(headlight2);
+
+  // 尾灯
+  const taillightMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xff0000,
+    emissive: 0xff0000,
+    emissiveIntensity: 0.5
+  });
+  const taillight1 = new THREE.Mesh(headlightGeometry, taillightMaterial);
+  taillight1.position.set(-0.6, 0.6, -2.26);
+  carGroup.add(taillight1);
+  const taillight2 = new THREE.Mesh(headlightGeometry, taillightMaterial);
+  taillight2.position.set(0.6, 0.6, -2.26);
+  carGroup.add(taillight2);
+
+  // 出租车标志
+  const signGeometry = new THREE.BoxGeometry(0.6, 0.15, 0.3);
+  const signMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0xffffff,
+    emissive: 0x00d4ff,
+    emissiveIntensity: 0.3
+  });
+  const sign = new THREE.Mesh(signGeometry, signMaterial);
+  sign.position.set(0, 1.45, 0.8);
+  carGroup.add(sign);
+
+  // 地面网格
+  const gridHelper = new THREE.GridHelper(20, 20, 0x3a5fff, 0x1a2050);
+  gridHelper.position.y = 0;
+  scene.add(gridHelper);
+
+  // 地面反射
+  const planeGeometry = new THREE.PlaneGeometry(20, 20);
+  const planeMaterial = new THREE.MeshPhongMaterial({ 
+    color: 0x0a0e27,
+    shininess: 100
+  });
+  const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+  plane.rotation.x = -Math.PI / 2;
+  plane.position.y = -0.01;
+  plane.receiveShadow = true;
+  scene.add(plane);
+
+  scene.add(carGroup);
+  is3DInitialized = true;
+
+  // 动画循环
+  animate3D();
+}
+
+function animate3D() {
+  if (!is3DInitialized) return;
+  requestAnimationFrame(animate3D);
+
+  // 汽车自动旋转
+  if (carGroup) {
+    carGroup.rotation.y += 0.005;
+    // 轻微上下浮动
+    carGroup.position.y = Math.sin(Date.now() * 0.001) * 0.05;
+  }
+
+  renderer.render(scene, camera);
+}
+
+// 窗口大小改变时调整3D画布
+window.addEventListener('resize', () => {
+  if (is3DInitialized && renderer && camera) {
+    const canvas = document.getElementById('car3dCanvas');
+    const container = canvas.parentElement;
+    const width = container.clientWidth;
+    const height = container.clientHeight - 100;
+    renderer.setSize(width, height);
+    camera.aspect = width / height;
+    camera.updateProjectionMatrix();
+  }
+});
 
 // ==================== 图表实例 ====================
 const chartTrend = echarts.init(document.getElementById('chartTrend'));
@@ -466,7 +888,6 @@ function formatMoney(num) {
   return '$' + num.toFixed(2);
 }
 
-// 数字滚动动画
 function animateValue(el, start, end, duration, prefix, suffix, decimals) {
   prefix = prefix || '';
   suffix = suffix || '';
@@ -512,17 +933,24 @@ function updateKPIs(month) {
   }
   const totalTrips = yellowSlice.reduce((s, d) => s + d.trips, 0) + greenSlice.reduce((s, d) => s + d.trips, 0);
   const totalRevenue = yellowSlice.reduce((s, d) => s + d.revenue, 0) + greenSlice.reduce((s, d) => s + d.revenue, 0);
+  const yellowTrips = yellowSlice.reduce((s, d) => s + d.trips, 0);
+  const greenTrips = greenSlice.reduce((s, d) => s + d.trips, 0);
   const allFares = yellowSlice.concat(greenSlice);
   const avgFare = allFares.reduce((s, d) => s + d.fare, 0) / allFares.length;
-  const avgDuration = allFares.reduce((s, d) => s + d.duration, 0) / allFares.length;
 
   animateValue(document.getElementById('kpiTrips'), 0, totalTrips, 1200, '', '', 0);
   animateValue(document.getElementById('kpiRevenue'), 0, totalRevenue, 1200, '$', '', 0);
+  animateValue(document.getElementById('kpiYellow'), 0, yellowTrips, 1200, '', '', 0);
+  animateValue(document.getElementById('kpiGreen'), 0, greenTrips, 1200, '', '', 0);
   animateValue(document.getElementById('kpiFare'), 0, avgFare, 1200, '$', '', 2);
-  animateValue(document.getElementById('kpiDuration'), 0, avgDuration, 1200, '', '', 1);
+
+  // 更新3D汽车区域的百分比
+  const yellowPct = ((yellowTrips / totalTrips) * 100).toFixed(1);
+  const greenPct = ((greenTrips / totalTrips) * 100).toFixed(1);
+  document.getElementById('carYellowPct').textContent = yellowPct + '%';
+  document.getElementById('carGreenPct').textContent = greenPct + '%';
 }
 
-// ==================== 月份筛选数据辅助 ====================
 function getFilteredData(month) {
   if (month === 'all') return { yellow: monthlyData.yellow, green: monthlyData.green };
   const m = parseInt(month);
@@ -532,7 +960,476 @@ function getFilteredData(month) {
   };
 }
 
-// ==================== 图表：月度趋势 ====================
+// ==================== 双击放大功能 ====================
+const chartTitles = {
+  trend: '📈 月度行程趋势（Yellow vs Green）',
+  heatmap: '🔥 24小时行程热力图',
+  borough: '🏙️ 行政区行程量',
+  payment: '💳 支付方式分布',
+  correlation: '🔗 特征相关性热力图',
+  cluster: '🎯 PCA聚类分析',
+  routes: '🛣️ 热门路线 TOP10',
+  prediction: '📊 预测验证对比'
+};
+
+function zoomChart(chartType) {
+  zoomedChartType = chartType;
+  document.getElementById('zoomTitle').textContent = chartTitles[chartType];
+  document.getElementById('zoomOverlay').classList.add('active');
+  
+  if (zoomedChart) {
+    zoomedChart.dispose();
+  }
+  zoomedChart = echarts.init(document.getElementById('zoomChartContainer'));
+  
+  switch(chartType) {
+    case 'trend': renderZoomTrend(); break;
+    case 'heatmap': renderZoomHeatmap(); break;
+    case 'borough': renderZoomBorough(); break;
+    case 'payment': renderZoomPayment(); break;
+    case 'correlation': renderZoomCorrelation(); break;
+    case 'cluster': renderZoomCluster(); break;
+    case 'routes': renderZoomRoutes(); break;
+    case 'prediction': renderZoomPrediction(); break;
+  }
+}
+
+function closeZoom() {
+  document.getElementById('zoomOverlay').classList.remove('active');
+  if (zoomedChart) {
+    zoomedChart.dispose();
+    zoomedChart = null;
+  }
+  zoomedChartType = null;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape' && document.getElementById('zoomOverlay').classList.contains('active')) {
+    closeZoom();
+  }
+});
+
+// ==================== 放大视图图表渲染函数 ====================
+function renderZoomTrend() {
+  const data = getFilteredData(currentMonth);
+  const months = data.yellow.map(d => d.month + '月');
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: function(params) {
+        let tip = '<b>' + params[0].axisValue + '</b><br/>';
+        params.forEach(p => {
+          tip += p.marker + p.seriesName + '：<b>' + formatNumber(p.value) + '</b> 次<br/>';
+        });
+        return tip;
+      }
+    },
+    legend: {
+      data: ['Yellow Taxi', 'Green Taxi'],
+      top: 10, right: 20,
+      textStyle: { color: '#8892b0', fontSize: 14 }
+    },
+    grid: { left: 80, right: 40, top: 60, bottom: 50 },
+    xAxis: {
+      type: 'category', data: months,
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 13 }
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, formatter: v => formatNumber(v) }
+    },
+    series: [
+      {
+        name: 'Yellow Taxi', type: 'line', data: data.yellow.map(d => d.trips),
+        smooth: true, symbol: 'circle', symbolSize: 10,
+        lineStyle: { color: '#ffd700', width: 3 },
+        itemStyle: { color: '#ffd700' },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: '#ffd70044' }, { offset: 1, color: '#ffd70008' }
+        ])}
+      },
+      {
+        name: 'Green Taxi', type: 'line', data: data.green.map(d => d.trips),
+        smooth: true, symbol: 'circle', symbolSize: 10,
+        lineStyle: { color: '#00e676', width: 3 },
+        itemStyle: { color: '#00e676' },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+          { offset: 0, color: '#00e67644' }, { offset: 1, color: '#00e67608' }
+        ])}
+      }
+    ]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomHeatmap() {
+  const heatData = [];
+  const hours = [];
+  for (let h = 0; h < 24; h++) {
+    hours.push(h + ':00');
+    for (let m = 1; m <= 12; m++) {
+      if (currentMonth === 'all' || parseInt(currentMonth) === m) {
+        const seasonFactor = 1 + 0.15 * Math.sin((m - 3) * Math.PI / 6);
+        const yellowVal = Math.round(hourlyData.yellow[h] * seasonFactor * (0.9 + Math.random() * 0.2));
+        const greenVal = Math.round(hourlyData.green[h] * seasonFactor * (0.9 + Math.random() * 0.2));
+        heatData.push([h, m - 1, yellowVal + greenVal]);
+      }
+    }
+  }
+
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const maxVal = Math.max(...heatData.map(d => d[2]));
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: function(p) {
+        return '<b>' + p.data[0] + ':00 - ' + months[p.data[1]] + '</b><br/>行程量：<b>' + formatNumber(p.data[2]) + '</b>';
+      }
+    },
+    grid: { left: 80, right: 60, top: 20, bottom: 60 },
+    xAxis: {
+      type: 'category', data: hours, splitArea: { show: true },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 12, interval: 1 }
+    },
+    yAxis: {
+      type: 'category', data: months, splitArea: { show: true },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 12 }
+    },
+    visualMap: {
+      min: 0, max: maxVal,
+      calculable: true, orient: 'horizontal', left: 'center', bottom: 10,
+      inRange: { color: ['#0a0e27', '#1a237e', '#1565c0', '#00bcd4', '#ffd700', '#ff5722'] },
+      textStyle: { color: '#8892b0', fontSize: 12 },
+      itemWidth: 20, itemHeight: 150
+    },
+    series: [{
+      type: 'heatmap', data: heatData,
+      label: { show: false },
+      emphasis: {
+        itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' }
+      }
+    }]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomBorough() {
+  const boroughs = boroughData.yellow.map(d => d.name);
+  const yellowVals = boroughData.yellow.map(d => {
+    const factor = currentMonth === 'all' ? 1 : (0.7 + Math.random() * 0.6);
+    return Math.round(d.value * factor);
+  });
+  const greenVals = boroughData.green.map(d => {
+    const factor = currentMonth === 'all' ? 1 : (0.7 + Math.random() * 0.6);
+    return Math.round(d.value * factor);
+  });
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: function(params) {
+        let tip = '<b>' + params[0].axisValue + '</b><br/>';
+        params.forEach(p => {
+          tip += p.marker + p.seriesName + '：<b>' + formatNumber(p.value) + '</b> 次<br/>';
+        });
+        return tip;
+      }
+    },
+    legend: {
+      data: ['Yellow', 'Green'], top: 10, right: 20,
+      textStyle: { color: '#8892b0', fontSize: 14 }
+    },
+    grid: { left: 120, right: 40, top: 50, bottom: 30 },
+    xAxis: { type: 'value',
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, formatter: v => formatNumber(v) }
+    },
+    yAxis: {
+      type: 'category', data: boroughs,
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 14 }
+    },
+    series: [
+      {
+        name: 'Yellow', type: 'bar', data: yellowVals, barWidth: 20,
+        itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+          { offset: 0, color: '#ffd70088' }, { offset: 1, color: '#ffd700' }
+        ]), borderRadius: [0, 5, 5, 0] }
+      },
+      {
+        name: 'Green', type: 'bar', data: greenVals, barWidth: 20,
+        itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+          { offset: 0, color: '#00e67688' }, { offset: 1, color: '#00e676' }
+        ]), borderRadius: [0, 5, 5, 0] }
+      }
+    ]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomPayment() {
+  const factor = currentMonth === 'all' ? 1 : (0.6 + Math.random() * 0.8);
+  const combined = paymentData.yellow.map((d, i) => ({
+    name: d.name,
+    value: Math.round((d.value + paymentData.green[i].value) * factor)
+  }));
+
+  const colors = ['#3a5fff', '#00d4ff', '#00e676', '#ffd700', '#ff5722', '#9c27b0'];
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'item',
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: p => '<b>' + p.name + '</b><br/>数量：<b>' + formatNumber(p.value) + '</b><br/>占比：<b>' + p.percent + '%</b>'
+    },
+    legend: {
+      orient: 'vertical', right: 40, top: 'center',
+      textStyle: { color: '#8892b0', fontSize: 14 },
+      itemWidth: 16, itemHeight: 16
+    },
+    series: [{
+      type: 'pie', radius: ['35%', '65%'], center: ['40%', '50%'],
+      data: combined,
+      label: { 
+        show: true, 
+        fontSize: 14, 
+        color: '#e0e6ff',
+        formatter: '{b}\n{c} ({d}%)'
+      },
+      emphasis: {
+        label: { show: true, fontSize: 16, fontWeight: 'bold' },
+        itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' }
+      },
+      itemStyle: { borderColor: '#111633', borderWidth: 3, borderRadius: 6 },
+      color: colors
+    }]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomCorrelation() {
+  const fields = correlationMatrix.fields;
+  const data = [];
+  for (let i = 0; i < fields.length; i++) {
+    for (let j = 0; j < fields.length; j++) {
+      data.push([j, i, correlationMatrix.data[i][j]]);
+    }
+  }
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: p => '<b>' + fields[p.data[0]] + ' vs ' + fields[p.data[1]] + '</b><br/>相关系数：<b>' + p.data[2].toFixed(2) + '</b>'
+    },
+    grid: { left: 100, right: 60, top: 20, bottom: 80 },
+    xAxis: {
+      type: 'category', data: fields, splitArea: { show: true },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, rotate: 30 }
+    },
+    yAxis: {
+      type: 'category', data: fields, splitArea: { show: true },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 13 }
+    },
+    visualMap: {
+      min: -1, max: 1, calculable: true, orient: 'horizontal', left: 'center', bottom: 10,
+      inRange: { color: ['#b71c1c', '#d32f2f', '#ff5722', '#ff9800', '#fff176', '#e0e0e0', '#90caf9', '#42a5f5', '#1e88e5', '#1565c0', '#0d47a1'] },
+      textStyle: { color: '#8892b0', fontSize: 12 },
+      itemWidth: 20, itemHeight: 150
+    },
+    series: [{
+      type: 'heatmap', data: data,
+      label: { show: true, color: '#e0e6ff', fontSize: 12, formatter: p => p.data[2].toFixed(2) },
+      emphasis: { itemStyle: { shadowBlur: 15, shadowColor: 'rgba(0,0,0,0.7)' } }
+    }]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomCluster() {
+  const clusterColors = ['#ffd700', '#ff5722', '#00e676'];
+  const clusterNames = ['Yellow 春秋季', 'Yellow 夏季', 'Green 全年'];
+  const filtered = currentMonth === 'all' ? clusterData : clusterData.filter(d => d.month === parseInt(currentMonth) + '月');
+
+  const series = [0, 1, 2].map(c => ({
+    name: clusterNames[c],
+    type: 'scatter',
+    data: filtered.filter(d => d.cluster === c).map(d => [d.x, d.y]),
+    symbolSize: 18,
+    itemStyle: { color: clusterColors[c], shadowBlur: 10, shadowColor: clusterColors[c] + '88' },
+    emphasis: {
+      itemStyle: { shadowBlur: 25, borderColor: '#fff', borderWidth: 2 }
+    }
+  }));
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: function(p) {
+        const item = filtered.find(d => d.x === p.data[0] && d.y === p.data[1]);
+        return '<b>' + (item ? item.month : '') + ' - ' + (item ? item.company : '') + '</b><br/>PC1: ' + p.data[0].toFixed(2) + '<br/>PC2: ' + p.data[1].toFixed(2);
+      }
+    },
+    legend: {
+      data: clusterNames, top: 10, right: 20,
+      textStyle: { color: '#8892b0', fontSize: 14 },
+      itemWidth: 16, itemHeight: 16
+    },
+    grid: { left: 70, right: 40, top: 60, bottom: 50 },
+    xAxis: {
+      name: 'PC1', nameTextStyle: { color: '#8892b0', fontSize: 14 },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13 }
+    },
+    yAxis: {
+      name: 'PC2', nameTextStyle: { color: '#8892b0', fontSize: 14 },
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13 }
+    },
+    series: series
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomRoutes() {
+  const factor = currentMonth === 'all' ? 1 : (0.5 + Math.random());
+  const routes = topRoutes.map(d => ({
+    name: d.from + ' → ' + d.to,
+    count: Math.round(d.count * factor)
+  })).reverse();
+
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis', axisPointer: { type: 'shadow' },
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: p => '<b>' + p[0].name + '</b><br/>行程数：<b>' + formatNumber(p[0].value) + '</b>'
+    },
+    grid: { left: 280, right: 60, top: 20, bottom: 30 },
+    xAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, formatter: v => formatNumber(v) }
+    },
+    yAxis: {
+      type: 'category', data: routes.map(d => d.name),
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, width: 260, overflow: 'truncate' }
+    },
+    series: [{
+      type: 'bar', data: routes.map(d => d.count), barWidth: 24,
+      itemStyle: {
+        color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+          { offset: 0, color: '#3a5fff66' }, { offset: 1, color: '#00d4ff' }
+        ]),
+        borderRadius: [0, 6, 6, 0]
+      },
+      label: {
+        show: true, position: 'right', color: '#8892b0', fontSize: 13,
+        formatter: p => formatNumber(p.value)
+      }
+    }]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+function renderZoomPrediction() {
+  const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+  const option = {
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      backgroundColor: '#1a2050ee',
+      borderColor: '#3a5fff',
+      textStyle: { color: '#e0e6ff', fontSize: 14 },
+      formatter: function(params) {
+        let tip = '<b>' + params[0].axisValue + '</b><br/>';
+        params.forEach(p => {
+          tip += p.marker + p.seriesName + '：<b>' + formatNumber(p.value) + '</b><br/>';
+        });
+        return tip;
+      }
+    },
+    legend: {
+      data: ['Yellow 实际', 'Yellow 预测', 'Green 实际', 'Green 预测'],
+      top: 10, right: 20,
+      textStyle: { color: '#8892b0', fontSize: 14 }
+    },
+    grid: { left: 90, right: 40, top: 60, bottom: 50 },
+    xAxis: {
+      type: 'category', data: months,
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      axisLabel: { color: '#8892b0', fontSize: 13 }
+    },
+    yAxis: {
+      type: 'value',
+      axisLine: { lineStyle: { color: '#2a3070' } },
+      splitLine: { lineStyle: { color: '#1a205055' } },
+      axisLabel: { color: '#8892b0', fontSize: 13, formatter: v => formatNumber(v) }
+    },
+    series: [
+      {
+        name: 'Yellow 实际', type: 'line', data: predictionData.yellow.actual,
+        smooth: true, symbol: 'circle', symbolSize: 10,
+        lineStyle: { color: '#ffd700', width: 3 },
+        itemStyle: { color: '#ffd700' }
+      },
+      {
+        name: 'Yellow 预测', type: 'line', data: predictionData.yellow.predicted,
+        smooth: true, symbol: 'diamond', symbolSize: 10,
+        lineStyle: { color: '#ffd700', width: 2, type: 'dashed' },
+        itemStyle: { color: '#ffd700aa' }
+      },
+      {
+        name: 'Green 实际', type: 'line', data: predictionData.green.actual,
+        smooth: true, symbol: 'circle', symbolSize: 10,
+        lineStyle: { color: '#00e676', width: 3 },
+        itemStyle: { color: '#00e676' }
+      },
+      {
+        name: 'Green 预测', type: 'line', data: predictionData.green.predicted,
+        smooth: true, symbol: 'diamond', symbolSize: 10,
+        lineStyle: { color: '#00e676', width: 2, type: 'dashed' },
+        itemStyle: { color: '#00e676aa' }
+      }
+    ]
+  };
+  zoomedChart.setOption(option, true);
+}
+
+// ==================== 原始图表渲染函数 ====================
 function renderTrend(month) {
   const data = getFilteredData(month);
   const months = data.yellow.map(d => d.month + '月');
@@ -554,24 +1451,24 @@ function renderTrend(month) {
     legend: {
       data: ['Yellow Taxi', 'Green Taxi'],
       top: 5, right: 10,
-      textStyle: { color: '#8892b0', fontSize: 11 }
+      textStyle: { color: '#8892b0', fontSize: 10 }
     },
     grid: { left: 60, right: 20, top: 40, bottom: 30 },
     xAxis: {
       type: 'category', data: months,
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 11 }
+      axisLabel: { color: '#8892b0', fontSize: 10 }
     },
     yAxis: {
       type: 'value',
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205055' } },
-      axisLabel: { color: '#8892b0', fontSize: 11, formatter: v => formatNumber(v) }
+      axisLabel: { color: '#8892b0', fontSize: 10, formatter: v => formatNumber(v) }
     },
     series: [
       {
         name: 'Yellow Taxi', type: 'line', data: data.yellow.map(d => d.trips),
-        smooth: true, symbol: 'circle', symbolSize: 6,
+        smooth: true, symbol: 'circle', symbolSize: 5,
         lineStyle: { color: '#ffd700', width: 2 },
         itemStyle: { color: '#ffd700' },
         areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -580,7 +1477,7 @@ function renderTrend(month) {
       },
       {
         name: 'Green Taxi', type: 'line', data: data.green.map(d => d.trips),
-        smooth: true, symbol: 'circle', symbolSize: 6,
+        smooth: true, symbol: 'circle', symbolSize: 5,
         lineStyle: { color: '#00e676', width: 2 },
         itemStyle: { color: '#00e676' },
         areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
@@ -592,16 +1489,13 @@ function renderTrend(month) {
   chartTrend.setOption(option, true);
 }
 
-// ==================== 图表：24小时热力图 ====================
 function renderHeatmap(month) {
-  // 生成热力图数据 [hour, month, value]
   const heatData = [];
   const hours = [];
   for (let h = 0; h < 24; h++) {
     hours.push(h + ':00');
     for (let m = 1; m <= 12; m++) {
       if (month === 'all' || parseInt(month) === m) {
-        // 模拟每月每小时数据，基于全年平均值加季节波动
         const seasonFactor = 1 + 0.15 * Math.sin((m - 3) * Math.PI / 6);
         const yellowVal = Math.round(hourlyData.yellow[h] * seasonFactor * (0.9 + Math.random() * 0.2));
         const greenVal = Math.round(hourlyData.green[h] * seasonFactor * (0.9 + Math.random() * 0.2));
@@ -618,28 +1512,28 @@ function renderHeatmap(month) {
     tooltip: {
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: function(p) {
         return '<b>' + p.data[0] + ':00 - ' + months[p.data[1]] + '</b><br/>行程量：<b>' + formatNumber(p.data[2]) + '</b>';
       }
     },
-    grid: { left: 60, right: 40, top: 10, bottom: 40 },
+    grid: { left: 55, right: 35, top: 10, bottom: 40 },
     xAxis: {
       type: 'category', data: hours, splitArea: { show: true },
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 10, interval: 2 }
+      axisLabel: { color: '#8892b0', fontSize: 9, interval: 2 }
     },
     yAxis: {
       type: 'category', data: months, splitArea: { show: true },
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 10 }
+      axisLabel: { color: '#8892b0', fontSize: 9 }
     },
     visualMap: {
       min: 0, max: maxVal,
       calculable: true, orient: 'horizontal', left: 'center', bottom: 0,
       inRange: { color: ['#0a0e27', '#1a237e', '#1565c0', '#00bcd4', '#ffd700', '#ff5722'] },
-      textStyle: { color: '#8892b0', fontSize: 10 },
-      itemWidth: 12, itemHeight: 100
+      textStyle: { color: '#8892b0', fontSize: 9 },
+      itemWidth: 10, itemHeight: 80
     },
     series: [{
       type: 'heatmap', data: heatData,
@@ -652,7 +1546,6 @@ function renderHeatmap(month) {
   chartHeatmap.setOption(option, true);
 }
 
-// ==================== 图表：行政区柱状图 ====================
 function renderBorough(month) {
   const boroughs = boroughData.yellow.map(d => d.name);
   const yellowVals = boroughData.yellow.map(d => {
@@ -670,7 +1563,7 @@ function renderBorough(month) {
       trigger: 'axis',
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: function(params) {
         let tip = '<b>' + params[0].axisValue + '</b><br/>';
         params.forEach(p => {
@@ -681,28 +1574,28 @@ function renderBorough(month) {
     },
     legend: {
       data: ['Yellow', 'Green'], top: 5, right: 5,
-      textStyle: { color: '#8892b0', fontSize: 10 }
+      textStyle: { color: '#8892b0', fontSize: 9 }
     },
-    grid: { left: 80, right: 10, top: 35, bottom: 5 },
+    grid: { left: 75, right: 10, top: 35, bottom: 5 },
     xAxis: { type: 'value',
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205055' } },
-      axisLabel: { color: '#8892b0', fontSize: 10, formatter: v => formatNumber(v) }
+      axisLabel: { color: '#8892b0', fontSize: 9, formatter: v => formatNumber(v) }
     },
     yAxis: {
       type: 'category', data: boroughs,
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 10 }
+      axisLabel: { color: '#8892b0', fontSize: 9 }
     },
     series: [
       {
-        name: 'Yellow', type: 'bar', data: yellowVals, barWidth: 8,
+        name: 'Yellow', type: 'bar', data: yellowVals, barWidth: 7,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#ffd70088' }, { offset: 1, color: '#ffd700' }
         ]), borderRadius: [0, 3, 3, 0] }
       },
       {
-        name: 'Green', type: 'bar', data: greenVals, barWidth: 8,
+        name: 'Green', type: 'bar', data: greenVals, barWidth: 7,
         itemStyle: { color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#00e67688' }, { offset: 1, color: '#00e676' }
         ]), borderRadius: [0, 3, 3, 0] }
@@ -711,7 +1604,6 @@ function renderBorough(month) {
   };
   chartBorough.setOption(option, true);
 
-  // 点击事件 - 弹出模态框
   chartBorough.off('click');
   chartBorough.on('click', function(params) {
     if (params.componentType === 'series') {
@@ -730,14 +1622,14 @@ function showBoroughModal(name, yellowVal, greenVal) {
   const avgDur = (13.0 + Math.random() * 2.5).toFixed(1);
 
   document.getElementById('modalBody').innerHTML =
-    '<tr><td>Yellow 行程数</td><td>' + formatNumber(yellowVal) + '</td><td>-</td></tr>' +
-    '<tr><td>Green 行程数</td><td>-</td><td>' + formatNumber(greenVal) + '</td></tr>' +
-    '<tr><td>总行程数</td><td colspan="2"><b>' + formatNumber(total) + '</b></td></tr>' +
-    '<tr><td>Yellow 占比</td><td colspan="2">' + yellowPct + '%</td></tr>' +
-    '<tr><td>Green 占比</td><td colspan="2">' + greenPct + '%</td></tr>' +
-    '<tr><td>平均车费</td><td colspan="2">$' + avgFare + '</td></tr>' +
-    '<tr><td>平均距离</td><td colspan="2">' + avgDist + ' 英里</td></tr>' +
-    '<tr><td>平均时长</td><td colspan="2">' + avgDur + ' 分钟</td></tr>';
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px; color: #ffd700;">Yellow 行程数</td><td style="padding: 10px;">' + formatNumber(yellowVal) + '</td><td style="padding: 10px;">-</td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px; color: #00e676;">Green 行程数</td><td style="padding: 10px;">-</td><td style="padding: 10px;">' + formatNumber(greenVal) + '</td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px;">总行程数</td><td style="padding: 10px;" colspan="2"><b style="color: #00d4ff;">' + formatNumber(total) + '</b></td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px;">Yellow 占比</td><td style="padding: 10px;" colspan="2">' + yellowPct + '%</td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px;">Green 占比</td><td style="padding: 10px;" colspan="2">' + greenPct + '%</td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px;">平均车费</td><td style="padding: 10px;" colspan="2">$' + avgFare + '</td></tr>' +
+    '<tr style="border-bottom: 1px solid #1a2050;"><td style="padding: 10px;">平均距离</td><td style="padding: 10px;" colspan="2">' + avgDist + ' 英里</td></tr>' +
+    '<tr><td style="padding: 10px;">平均时长</td><td style="padding: 10px;" colspan="2">' + avgDur + ' 分钟</td></tr>';
   document.getElementById('modalOverlay').classList.add('active');
 }
 
@@ -746,7 +1638,6 @@ function closeModal(e) {
   document.getElementById('modalOverlay').classList.remove('active');
 }
 
-// ==================== 图表：支付方式环形图 ====================
 function renderPayment(month) {
   const factor = month === 'all' ? 1 : (0.6 + Math.random() * 0.8);
   const combined = paymentData.yellow.map((d, i) => ({
@@ -761,12 +1652,12 @@ function renderPayment(month) {
       trigger: 'item',
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: p => '<b>' + p.name + '</b><br/>数量：<b>' + formatNumber(p.value) + '</b><br/>占比：<b>' + p.percent + '%</b>'
     },
     legend: {
       orient: 'vertical', right: 5, top: 'center',
-      textStyle: { color: '#8892b0', fontSize: 10 },
+      textStyle: { color: '#8892b0', fontSize: 9 },
       itemWidth: 10, itemHeight: 10
     },
     series: [{
@@ -774,7 +1665,7 @@ function renderPayment(month) {
       data: combined,
       label: { show: false },
       emphasis: {
-        label: { show: true, fontSize: 12, fontWeight: 'bold', color: '#e0e6ff' },
+        label: { show: true, fontSize: 11, fontWeight: 'bold', color: '#e0e6ff' },
         itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' }
       },
       itemStyle: { borderColor: '#111633', borderWidth: 2, borderRadius: 4 },
@@ -784,7 +1675,6 @@ function renderPayment(month) {
   chartPayment.setOption(option, true);
 }
 
-// ==================== 图表：相关性热力图 ====================
 function renderCorrelation() {
   const fields = correlationMatrix.fields;
   const data = [];
@@ -799,36 +1689,35 @@ function renderCorrelation() {
     tooltip: {
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: p => '<b>' + fields[p.data[0]] + ' vs ' + fields[p.data[1]] + '</b><br/>相关系数：<b>' + p.data[2].toFixed(2) + '</b>'
     },
-    grid: { left: 70, right: 40, top: 10, bottom: 50 },
+    grid: { left: 65, right: 35, top: 10, bottom: 45 },
     xAxis: {
       type: 'category', data: fields, splitArea: { show: true },
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 10, rotate: 30 }
+      axisLabel: { color: '#8892b0', fontSize: 9, rotate: 30 }
     },
     yAxis: {
       type: 'category', data: fields, splitArea: { show: true },
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 10 }
+      axisLabel: { color: '#8892b0', fontSize: 9 }
     },
     visualMap: {
       min: -1, max: 1, calculable: true, orient: 'horizontal', left: 'center', bottom: 0,
       inRange: { color: ['#b71c1c', '#d32f2f', '#ff5722', '#ff9800', '#fff176', '#e0e0e0', '#90caf9', '#42a5f5', '#1e88e5', '#1565c0', '#0d47a1'] },
-      textStyle: { color: '#8892b0', fontSize: 10 },
-      itemWidth: 12, itemHeight: 100
+      textStyle: { color: '#8892b0', fontSize: 9 },
+      itemWidth: 10, itemHeight: 80
     },
     series: [{
       type: 'heatmap', data: data,
-      label: { show: true, color: '#e0e6ff', fontSize: 9, formatter: p => p.data[2].toFixed(1) },
+      label: { show: true, color: '#e0e6ff', fontSize: 8, formatter: p => p.data[2].toFixed(1) },
       emphasis: { itemStyle: { shadowBlur: 10, shadowColor: 'rgba(0,0,0,0.5)' } }
     }]
   };
   chartCorrelation.setOption(option, true);
 }
 
-// ==================== 图表：聚类散点图 ====================
 function renderCluster(month) {
   const clusterColors = ['#ffd700', '#ff5722', '#00e676'];
   const clusterNames = ['Yellow 春秋季', 'Yellow 夏季', 'Green 全年'];
@@ -838,7 +1727,7 @@ function renderCluster(month) {
     name: clusterNames[c],
     type: 'scatter',
     data: filtered.filter(d => d.cluster === c).map(d => [d.x, d.y]),
-    symbolSize: 12,
+    symbolSize: 10,
     itemStyle: { color: clusterColors[c], shadowBlur: 5, shadowColor: clusterColors[c] + '66' },
     emphasis: {
       itemStyle: { shadowBlur: 15, borderColor: '#fff', borderWidth: 1 }
@@ -850,7 +1739,7 @@ function renderCluster(month) {
     tooltip: {
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: function(p) {
         const item = filtered.find(d => d.x === p.data[0] && d.y === p.data[1]);
         return '<b>' + (item ? item.month : '') + ' - ' + (item ? item.company : '') + '</b><br/>PC1: ' + p.data[0].toFixed(2) + '<br/>PC2: ' + p.data[1].toFixed(2);
@@ -858,28 +1747,27 @@ function renderCluster(month) {
     },
     legend: {
       data: clusterNames, top: 5, right: 5,
-      textStyle: { color: '#8892b0', fontSize: 10 },
+      textStyle: { color: '#8892b0', fontSize: 9 },
       itemWidth: 10, itemHeight: 10
     },
     grid: { left: 45, right: 15, top: 35, bottom: 30 },
     xAxis: {
-      name: 'PC1', nameTextStyle: { color: '#8892b0', fontSize: 10 },
+      name: 'PC1', nameTextStyle: { color: '#8892b0', fontSize: 9 },
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205044' } },
-      axisLabel: { color: '#8892b0', fontSize: 10 }
+      axisLabel: { color: '#8892b0', fontSize: 9 }
     },
     yAxis: {
-      name: 'PC2', nameTextStyle: { color: '#8892b0', fontSize: 10 },
+      name: 'PC2', nameTextStyle: { color: '#8892b0', fontSize: 9 },
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205044' } },
-      axisLabel: { color: '#8892b0', fontSize: 10 }
+      axisLabel: { color: '#8892b0', fontSize: 9 }
     },
     series: series
   };
   chartCluster.setOption(option, true);
 }
 
-// ==================== 图表：热门路线 TOP10 ====================
 function renderRoutes(month) {
   const factor = month === 'all' ? 1 : (0.5 + Math.random());
   const routes = topRoutes.map(d => ({
@@ -893,23 +1781,23 @@ function renderRoutes(month) {
       trigger: 'axis', axisPointer: { type: 'shadow' },
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: p => '<b>' + p[0].name + '</b><br/>行程数：<b>' + formatNumber(p[0].value) + '</b>'
     },
-    grid: { left: 160, right: 30, top: 5, bottom: 5 },
+    grid: { left: 150, right: 30, top: 5, bottom: 5 },
     xAxis: {
       type: 'value',
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205044' } },
-      axisLabel: { color: '#8892b0', fontSize: 10, formatter: v => formatNumber(v) }
+      axisLabel: { color: '#8892b0', fontSize: 9, formatter: v => formatNumber(v) }
     },
     yAxis: {
       type: 'category', data: routes.map(d => d.name),
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 9, width: 150, overflow: 'truncate' }
+      axisLabel: { color: '#8892b0', fontSize: 8, width: 140, overflow: 'truncate' }
     },
     series: [{
-      type: 'bar', data: routes.map(d => d.count), barWidth: 14,
+      type: 'bar', data: routes.map(d => d.count), barWidth: 12,
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
           { offset: 0, color: '#3a5fff44' }, { offset: 1, color: '#00d4ff' }
@@ -917,7 +1805,7 @@ function renderRoutes(month) {
         borderRadius: [0, 4, 4, 0]
       },
       label: {
-        show: true, position: 'right', color: '#8892b0', fontSize: 9,
+        show: true, position: 'right', color: '#8892b0', fontSize: 8,
         formatter: p => formatNumber(p.value)
       }
     }]
@@ -925,7 +1813,6 @@ function renderRoutes(month) {
   chartRoutes.setOption(option, true);
 }
 
-// ==================== 图表：预测验证对比 ====================
 function renderPrediction(month) {
   const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
   const option = {
@@ -934,7 +1821,7 @@ function renderPrediction(month) {
       trigger: 'axis',
       backgroundColor: '#1a2050ee',
       borderColor: '#3a5fff',
-      textStyle: { color: '#e0e6ff', fontSize: 12 },
+      textStyle: { color: '#e0e6ff', fontSize: 11 },
       formatter: function(params) {
         let tip = '<b>' + params[0].axisValue + '</b><br/>';
         params.forEach(p => {
@@ -946,42 +1833,42 @@ function renderPrediction(month) {
     legend: {
       data: ['Yellow 实际', 'Yellow 预测', 'Green 实际', 'Green 预测'],
       top: 5, right: 10,
-      textStyle: { color: '#8892b0', fontSize: 10 }
+      textStyle: { color: '#8892b0', fontSize: 9 }
     },
     grid: { left: 70, right: 20, top: 40, bottom: 30 },
     xAxis: {
       type: 'category', data: months,
       axisLine: { lineStyle: { color: '#2a3070' } },
-      axisLabel: { color: '#8892b0', fontSize: 11 }
+      axisLabel: { color: '#8892b0', fontSize: 10 }
     },
     yAxis: {
       type: 'value',
       axisLine: { lineStyle: { color: '#2a3070' } },
       splitLine: { lineStyle: { color: '#1a205055' } },
-      axisLabel: { color: '#8892b0', fontSize: 11, formatter: v => formatNumber(v) }
+      axisLabel: { color: '#8892b0', fontSize: 10, formatter: v => formatNumber(v) }
     },
     series: [
       {
         name: 'Yellow 实际', type: 'line', data: predictionData.yellow.actual,
-        smooth: true, symbol: 'circle', symbolSize: 6,
+        smooth: true, symbol: 'circle', symbolSize: 5,
         lineStyle: { color: '#ffd700', width: 2 },
         itemStyle: { color: '#ffd700' }
       },
       {
         name: 'Yellow 预测', type: 'line', data: predictionData.yellow.predicted,
-        smooth: true, symbol: 'diamond', symbolSize: 6,
+        smooth: true, symbol: 'diamond', symbolSize: 5,
         lineStyle: { color: '#ffd700', width: 1, type: 'dashed' },
         itemStyle: { color: '#ffd700aa' }
       },
       {
         name: 'Green 实际', type: 'line', data: predictionData.green.actual,
-        smooth: true, symbol: 'circle', symbolSize: 6,
+        smooth: true, symbol: 'circle', symbolSize: 5,
         lineStyle: { color: '#00e676', width: 2 },
         itemStyle: { color: '#00e676' }
       },
       {
         name: 'Green 预测', type: 'line', data: predictionData.green.predicted,
-        smooth: true, symbol: 'diamond', symbolSize: 6,
+        smooth: true, symbol: 'diamond', symbolSize: 5,
         lineStyle: { color: '#00e676', width: 1, type: 'dashed' },
         itemStyle: { color: '#00e676aa' }
       }
@@ -1002,6 +1889,19 @@ function updateAll(month) {
   renderCluster(month);
   renderRoutes(month);
   renderPrediction(month);
+  
+  if (zoomedChart && document.getElementById('zoomOverlay').classList.contains('active')) {
+    switch(zoomedChartType) {
+      case 'trend': renderZoomTrend(); break;
+      case 'heatmap': renderZoomHeatmap(); break;
+      case 'borough': renderZoomBorough(); break;
+      case 'payment': renderZoomPayment(); break;
+      case 'correlation': renderZoomCorrelation(); break;
+      case 'cluster': renderZoomCluster(); break;
+      case 'routes': renderZoomRoutes(); break;
+      case 'prediction': renderZoomPrediction(); break;
+    }
+  }
 }
 
 // ==================== 月份选择事件 ====================
@@ -1016,12 +1916,12 @@ function toggleAutoPlay() {
   if (isAutoPlaying) {
     clearInterval(autoPlayTimer);
     isAutoPlaying = false;
-    btn.textContent = '自动播放';
+    btn.textContent = '▶ 自动播放';
     btn.classList.remove('playing');
   } else {
     isAutoPlaying = true;
     autoPlayIndex = 0;
-    btn.textContent = '暂停播放';
+    btn.textContent = '⏸ 暂停播放';
     btn.classList.add('playing');
     autoPlayTimer = setInterval(function() {
       autoPlayIndex = (autoPlayIndex % 12) + 1;
@@ -1034,10 +1934,14 @@ function toggleAutoPlay() {
 // ==================== 窗口自适应 ====================
 window.addEventListener('resize', function() {
   allCharts.forEach(c => c.resize());
+  if (zoomedChart) zoomedChart.resize();
 });
 
 // ==================== 初始化 ====================
 updateAll('all');
+
+// 初始化3D汽车（延迟一点确保DOM已准备好）
+setTimeout(init3DCar, 100);
 </script>
 </body>
 </html>
