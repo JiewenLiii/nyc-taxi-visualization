@@ -1,3 +1,15 @@
+# 严格匹配你定义的目录名 Raw Date（带空格）
+Raw Date/
+# 忽略所有原始数据格式（parquet/csv/excel 等大数据文件）
+*.parquet
+*.csv
+*.xlsx
+*.xls
+*.zip
+*.rar
+*.gz
+*.7z
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

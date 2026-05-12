@@ -6,8 +6,15 @@ const {
   ShadingType, VerticalAlign, PageNumber, PageBreak
 } = require("docx");
 
-const ANALYSIS_DIR = "D:\\数据可视化大作业\\出租车\\analysis";
-const OUTPUT_PATH = "D:\\数据可视化大作业\\出租车\\report\\数据可视化大作业报告.docx";
+
+// 路径配置
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+IMG_DIR = os.path.join(BASE_DIR, "analysis")
+REPORT_DIR = os.path.join(BASE_DIR, "report")
+
+//自动创建输出目录
+os.makedirs(REPORT_DIR, exist_ok=True)
 
 // Helper functions
 function heading1(text) {

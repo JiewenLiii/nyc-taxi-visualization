@@ -23,8 +23,13 @@ warnings.filterwarnings('ignore')
 plt.rcParams['font.sans-serif'] = ['Microsoft YaHei', 'SimHei']
 plt.rcParams['axes.unicode_minus'] = False
 
-DATA_DIR = r'D:\数据可视化大作业\出租车\data'
-IMG_DIR = r'D:\数据可视化大作业\出租车\analysis'
+# 路径配置
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATA_DIR = os.path.join(BASE_DIR, "data")
+IMG_DIR = os.path.join(BASE_DIR, "analysis")
+
+# 自动创建输出目录
+os.makedirs(IMG_DIR, exist_ok=True)
 
 def load_data():
     files = {

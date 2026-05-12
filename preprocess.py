@@ -10,9 +10,15 @@ import gc
 import warnings
 warnings.filterwarnings('ignore')
 
-DATA_DIR = r'd:\数据可视化大作业\题目及数据\材料'
-OUTPUT_DIR = r'D:\数据可视化大作业\出租车\data'
-ZONE_CSV = os.path.join(DATA_DIR, 'taxi_zone_lookup.csv')
+# 路径配置
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+RAW_DATA_DIR = os.path.join(BASE_DIR, "Raw Date")
+DATA_DIR = os.path.join(BASE_DIR, "data")
+
+# 自动创建输出目录
+os.makedirs(DATA_DIR, exist_ok=True)
+
+ZONE_CSV = os.path.join(RAW_DATA_DIR, 'taxi_zone_lookup.csv')
 
 def load_monthly_data(company, month):
     fname = f'{company}_tripdata_2018-{month:02d}.parquet'

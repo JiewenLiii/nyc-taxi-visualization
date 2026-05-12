@@ -6,12 +6,14 @@
 
 import os
 
-# 目标输出路径
-OUTPUT_DIR = r"D:\数据可视化大作业\出租车\dashboard"
-OUTPUT_FILE = os.path.join(OUTPUT_DIR, "index.html")
+# 路径配置
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DASHBOARD_DIR = os.path.join(BASE_DIR, "dashboard")
 
-# 确保输出目录存在
-os.makedirs(OUTPUT_DIR, exist_ok=True)
+# 自动创建输出目录
+os.makedirs(DASHBOARD_DIR, exist_ok=True)
+
+OUTPUT_FILE = os.path.join(DASHBOARD_DIR, "index.html")
 
 html_content = r'''<!DOCTYPE html>
 <html lang="zh-CN">
