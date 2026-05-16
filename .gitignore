@@ -1,0 +1,18 @@
+# 原始数据（太大，从官网下载）
+Yellow/
+Green/
+
+# 清洗后数据（中间产物，可重新生成）
+Yellow_清洗后/
+Green_清洗后/
+
+# Python缓存
+__pycache__/
+__pycache__.zip
+
+# 临时文件
+bg.jpg
+dashboard_data/_sample_cache.parquet
+dashboard_data/bg(1).jpg
+dashboard_data/_shapefiles/
+nyc_weather_2018.csv

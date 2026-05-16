@@ -1,0 +1,134 @@
+{
+  "columns": [
+    "月份",
+    "Yellow行程",
+    "Green行程",
+    "总行程",
+    "平均票价",
+    "平均距离",
+    "最高温(°F)",
+    "降水量(in)"
+  ],
+  "data": [
+    {
+      "month": "1月",
+      "yellow_trips": 8517514,
+      "green_trips": 759948,
+      "total_trips": 9277462,
+      "avg_fare": 11.87,
+      "avg_distance": 2.71,
+      "max_temp": 39,
+      "precipitation": 2.18
+    },
+    {
+      "month": "2月",
+      "yellow_trips": 8261939,
+      "green_trips": 740005,
+      "total_trips": 9001944,
+      "avg_fare": 11.88,
+      "avg_distance": 2.71,
+      "max_temp": 50,
+      "precipitation": 5.83
+    },
+    {
+      "month": "3月",
+      "yellow_trips": 9148792,
+      "green_trips": 803176,
+      "total_trips": 9951968,
+      "avg_fare": 12.25,
+      "avg_distance": 2.8,
+      "max_temp": 46,
+      "precipitation": 5.17
+    },
+    {
+      "month": "4月",
+      "yellow_trips": 9024409,
+      "green_trips": 767444,
+      "total_trips": 9791853,
+      "avg_fare": 12.59,
+      "avg_distance": 2.87,
+      "max_temp": 62,
+      "precipitation": 3.21
+    },
+    {
+      "month": "5月",
+      "yellow_trips": 8936272,
+      "green_trips": 763215,
+      "total_trips": 9699487,
+      "avg_fare": 12.99,
+      "avg_distance": 2.95,
+      "max_temp": 72,
+      "precipitation": 4.15
+    },
+    {
+      "month": "6月",
+      "yellow_trips": 8436459,
+      "green_trips": 708460,
+      "total_trips": 9144919,
+      "avg_fare": 12.91,
+      "avg_distance": 2.96,
+      "max_temp": 82,
+      "precipitation": 3.08
+    },
+    {
+      "month": "7月",
+      "yellow_trips": 7599344,
+      "green_trips": 655185,
+      "total_trips": 8254529,
+      "avg_fare": 12.75,
+      "avg_distance": 2.95,
+      "max_temp": 89,
+      "precipitation": 3.62
+    },
+    {
+      "month": "8月",
+      "yellow_trips": 7594970,
+      "green_trips": 628828,
+      "total_trips": 8223798,
+      "avg_fare": 12.74,
+      "avg_distance": 2.97,
+      "max_temp": 86,
+      "precipitation": 3.91
+    },
+    {
+      "month": "9月",
+      "yellow_trips": 7778409,
+      "green_trips": 624070,
+      "total_trips": 8402479,
+      "avg_fare": 13.08,
+      "avg_distance": 2.96,
+      "max_temp": 78,
+      "precipitation": 3.45
+    },
+    {
+      "month": "10月",
+      "yellow_trips": 8497944,
+      "green_trips": 660634,
+      "total_trips": 9158578,
+      "avg_fare": 13.09,
+      "avg_distance": 2.93,
+      "max_temp": 68,
+      "precipitation": 3.92
+    },
+    {
+      "month": "11月",
+      "yellow_trips": 7841199,
+      "green_trips": 608856,
+      "total_trips": 8450055,
+      "avg_fare": 13.03,
+      "avg_distance": 2.89,
+      "max_temp": 55,
+      "precipitation": 3.28
+    },
+    {
+      "month": "12月",
+      "yellow_trips": 7854921,
+      "green_trips": 621277,
+      "total_trips": 8476198,
+      "avg_fare": 12.76,
+      "avg_distance": 2.85,
+      "max_temp": 48,
+      "precipitation": 4.51
+    }
+  ]
+}
