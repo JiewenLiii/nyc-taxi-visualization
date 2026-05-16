@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NYC Taxi 数据可视化分析平台</title>
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+    <script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+        }
+    }
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+            background: url('dashboard_data/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: #fff;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        /* 顶部标题栏 */
+        .header {
+            background: rgba(5, 10, 25, 0.4);
+            backdrop-filter: blur(6px);
+            padding: 8px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid rgba(100, 180, 255, 0.3);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+            height: 48px;
+        }
+        .header-left { display: flex; align-items: center; gap: 12px; font-size: 13px; color: #8ab4c7; }
+        .header-center { 
+            font-size: 22px; 
+            font-weight: 200; 
+            letter-spacing: 3px;
+            background: linear-gradient(90deg, #00E5FF, #00B8D4, #00E5FF);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .header-right { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+        .action-btn {
+            padding: 5px 10px;
+            background: rgba(0, 180, 255, 0.12);
+            border: 1px solid rgba(0, 180, 255, 0.3);
+            color: #a0d8ef;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 11px;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+        .action-btn:hover {
+            background: rgba(0, 180, 255, 0.2);
+            border-color: rgba(0, 180, 255, 0.5);
+            color: #fff;
+        }
+        .filter-select {
+            padding: 5px 10px;
+            background: rgba(0, 20, 40, 0.6);
+            border: 1px solid rgba(100, 180, 255, 0.3);
+            color: #fff;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        /* 页面切换按钮区 */
+        .page-switcher {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 8px 24px;
+            background: rgba(10, 22, 40, 0.5);
+        }
+        .page-btn {
+            width: 120px;
+            height: 36px;
+            background: rgba(5, 10, 25, 0.35);
+            border: 1px solid rgba(0, 180, 255, 0.15);
+            border-radius: 2px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: rgba(160, 196, 232, 0.7);
+            backdrop-filter: blur(4px);
+        }
+        .page-btn:hover {
+            background: rgba(0, 180, 255, 0.1);
+            border-color: rgba(0, 180, 255, 0.3);
+            color: #c0daf0;
+        }
+        .page-btn.active {
+            background: rgba(0, 180, 255, 0.12);
+            border-color: rgba(0, 180, 255, 0.4);
+            color: #fff;
+            box-shadow: 0 0 10px rgba(0, 180, 255, 0.15);
+        }
+        .page-btn .label { font-size: 13px; font-weight: 500; letter-spacing: 1px; }
+        
+        /* 主内容区 */
+        .main-container {
+            height: calc(100vh - 48px - 60px);
+            padding: 8px 16px 12px;
+            position: relative;
+        }
+        .page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 0 16px 12px;
+            display: none;
+        }
+        .page.active {
+            display: block;
+            position: relative;
+        }
+        
+        /* 页面背景图 */
+        .pages-container {
+            background: url('dashboard_data/bg.jpg') no-repeat center center fixed;
+            background-size: cover;
+        }
+        
+        /* 通用图表卡片 */
+        .chart-card {
+            background: rgba(5, 10, 25, 0.25);
+            border: none;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: pointer;
+            position: relative;
+            backdrop-filter: blur(6px);
+        }
+        /* 四角框线装饰 */
+        .chart-card::before,
+        .chart-card::after {
+            content: '';
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: rgba(0, 180, 255, 0.6);
+            border-style: solid;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .chart-card::before {
+            top: 0; left: 0;
+            border-width: 2px 0 0 2px;
+        }
+        .chart-card::after {
+            top: 0; right: 0;
+            border-width: 2px 2px 0 0;
+        }
+        .chart-card .corner-bl,
+        .chart-card .corner-br {
+            position: absolute;
+            width: 16px;
+            height: 16px;
+            border-color: rgba(0, 180, 255, 0.6);
+            border-style: solid;
+            z-index: 2;
+            pointer-events: none;
+        }
+        .chart-card .corner-bl {
+            bottom: 0; left: 0;
+            border-width: 0 0 2px 2px;
+        }
+        .chart-card .corner-br {
+            bottom: 0; right: 0;
+            border-width: 0 2px 2px 0;
+        }
+        .chart-card:hover {
+            box-shadow: none;
+            background: rgba(5, 10, 25, 0.35);
+        }
+        .chart-card:hover::before,
+        .chart-card:hover::after,
+        .chart-card:hover .corner-bl,
+        .chart-card:hover .corner-br {
+            border-color: rgba(0, 229, 255, 0.9);
+        }
+        .chart-header {
+            padding: 6px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(100, 180, 255, 0.1);
+            flex-shrink: 0;
+        }
+        .chart-title { font-size: 12px; font-weight: 600; color: #b8d4e8; }
+        .chart-badge {
+            padding: 1px 6px;
+            background: rgba(100, 180, 255, 0.15);
+            border-radius: 10px;
+            font-size: 9px;
+            color: #64b4ff;
+        }
+        .chart-content {
+            flex: 1;
+            min-height: 0;
+        }
+        
+        /* ========== 第一页：数据概览 ========== */
+        .page1-grid {
+            display: grid;
+            grid-template-columns: 0.8fr 1.4fr 0.8fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: 100%;
+        }
+        .page1-left-top { grid-row: 1; }
+        .page1-left-bottom { grid-row: 2; }
+        .page1-center {
+            grid-row: 1 / 3;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .page1-center-top {
+            flex: 1.2;
+            background: rgba(5, 10, 25, 0.05);
+            border-radius: 0;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(3px);
+        }
+        .page1-center-bottom {
+            flex: 0.8;
+            background: rgba(5, 10, 25, 0.25);
+            border: none;
+            border-radius: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(4px);
+        }
+        .page1-right-top { grid-row: 1; }
+        .page1-right-bottom { grid-row: 2; }
+        
+        /* 3D模型区域 */
+        .taxi-model-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        #taxi-3d-canvas {
+            width: 100%;
+            height: 100%;
+        }
+        .kpi-sides {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            display: flex;
+            justify-content: space-between;
+            padding: 50px 12px 12px;
+        }
+        .kpi-column {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            pointer-events: auto;
+        }
+        .kpi-item {
+            background: rgba(5, 10, 25, 0.25);
+            border: none;
+            border-radius: 0;
+            padding: 6px 10px;
+            text-align: center;
+            backdrop-filter: blur(6px);
+            min-width: 85px;
+        }
+        .kpi-value { font-size: 16px; font-weight: bold; color: #4fc3f7; }
+        .kpi-label { font-size: 9px; color: #8ab4c7; margin-top: 1px; }
+        
+        /* ========== 第二页：趋势分析 ========== */
+        .page2-grid {
+            display: grid;
+            grid-template-columns: 0.8fr 1.4fr 0.8fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 10px;
+            height: 100%;
+        }
+        .page2-left-top { grid-row: 1; }
+        .page2-left-bottom { grid-row: 2; }
+        .page2-center-top { grid-row: 1; }
+        .page2-center-bottom { grid-row: 2; }
+        .page2-right-top { grid-row: 1; }
+        .page2-right-bottom { grid-row: 2; }
+        
+        /* ========== 第三页：地理分布 ========== */
+        .page3-grid {
+            display: grid;
+            grid-template-columns: 0.6fr 1.4fr 0.8fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+            height: 100%;
+        }
+        .page3-left {
+            grid-row: 1 / 4;
+        }
+        .page3-center-top { grid-row: 1; }
+        .page3-center-middle { grid-row: 2; }
+        .page3-center-bottom { grid-row: 3; }
+        .page3-right-top { grid-row: 1; }
+        .page3-right-middle { grid-row: 2; }
+        .page3-right-bottom { grid-row: 3; }
+        
+        /* 加载遮罩 */
+        .loading-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(10,14,23,0.95); display: flex;
+            flex-direction: column; justify-content: center; align-items: center; z-index: 9999;
+        }
+        .loading-spinner {
+            width: 50px; height: 50px; border: 3px solid #2a3040;
+            border-top: 3px solid #00E5FF; border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { margin-top: 16px; color: #889; font-size: 14px; }
+        
+        /* 双击放大遮罩层 */
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(5, 10, 20, 0.7);
+            z-index: 9998;
+            cursor: pointer;
+            flex-direction: column;
+        }
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+        .fullscreen-overlay .fs-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 24px;
+            border-bottom: 1px solid rgba(0, 180, 255, 0.2);
+        }
+        .fullscreen-overlay .fs-title {
+            font-size: 16px;
+            color: #b8d4e8;
+            font-weight: 600;
+        }
+        .fullscreen-overlay .fs-close {
+            padding: 6px 16px;
+            background: rgba(255, 87, 34, 0.8);
+            border: none;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .fullscreen-overlay .fs-chart {
+            flex: 1;
+            padding: 16px;
+        }
+        
+        /* 表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .data-table th, .data-table td {
+            padding: 6px 8px;
+            text-align: left;
+            border-bottom: 1px solid rgba(100, 180, 255, 0.1);
+        }
+        .data-table th {
+            background: rgba(100, 180, 255, 0.1);
+            color: #64b4ff;
+            font-weight: 600;
+            font-size: 9px;
+        }
+        .data-table td { color: #b8d4e8; font-size: 9px; }
+    </style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">正在加载数据并渲染可视化图表...</div>
+</div>
+
+<!-- 双击放大遮罩层 -->
+<div class="fullscreen-overlay" id="fullscreenOverlay" onclick="closeFullscreen(event)">
+    <div class="fs-header">
+        <div class="fs-title" id="fullscreenTitle">图表详情</div>
+        <button class="fs-close" onclick="closeFullscreen(event)">✕ 关闭</button>
+    </div>
+    <div class="fs-chart" id="fullscreenChart"></div>
+</div>
+
+<!-- 表格放大遮罩层 -->
+<div class="fullscreen-overlay" id="tableFullscreenOverlay" onclick="closeTableFullscreen(event)">
+    <div class="fs-header">
+        <div class="fs-title" id="tableFullscreenTitle">详细数据表格</div>
+        <button class="fs-close" onclick="closeTableFullscreen(event)">✕ 关闭</button>
+    </div>
+    <div class="fs-chart" id="fullscreenTableContainer" style="padding: 20px; overflow: auto;">
+        <table class="data-table" id="fullscreenTable" style="font-size: 18px;">
+            <thead><tr id="fullscreenTableHeader"></tr></thead>
+            <tbody id="fullscreenTableBody"></tbody>
+        </table>
+    </div>
+</div>
+
+<!-- 顶部标题栏 -->
+<div class="header">
+    <div class="header-left">
+        <span>时间筛选:</span>
+        <select class="filter-select" id="monthFilter" onchange="onMonthChange()">
+            <option value="0">全年</option>
+            <option value="1">一月</option><option value="2">二月</option>
+            <option value="3">三月</option><option value="4">四月</option>
+            <option value="5">五月</option><option value="6">六月</option>
+            <option value="7">七月</option><option value="8">八月</option>
+            <option value="9">九月</option><option value="10">十月</option>
+            <option value="11">十一月</option><option value="12">十二月</option>
+        </select>
+    </div>
+    <div class="header-center">NYC TAXI 数据可视化分析平台</div>
+    <div class="header-right">
+        <button class="action-btn" id="btnToggleKPI" onclick="toggleKPI()">隐藏KPI</button>
+        <button class="action-btn" id="btnAutoPlay" onclick="toggleAutoPlay()">自动播放</button>
+        <button class="action-btn" id="btnRotate" onclick="toggleRotate()">停止旋转</button>
+        <button class="action-btn" onclick="resetAll()">重置</button>
+    </div>
+</div>
+
+<!-- 页面切换按钮 -->
+<div class="page-switcher">
+    <div class="page-btn active" onclick="switchPage(1)" data-page="1">
+        <div class="label">综合概览</div>
+    </div>
+    <div class="page-btn" onclick="switchPage(2)" data-page="2">
+        <div class="label">运营分析</div>
+    </div>
+    <div class="page-btn" onclick="switchPage(3)" data-page="3">
+        <div class="label">空间分布</div>
+    </div>
+</div>
+
+<!-- 主内容区 -->
+<div class="main-container">
+    
+    <!-- 第一页：数据概览 -->
+    <div class="page active" id="page1">
+        <div class="page1-grid">
+            <!-- 左侧 -->
+            <div class="chart-card page1-left-top">
+                <div class="chart-header">
+                    <div class="chart-title">聚类特征雷达图</div>
+
+                </div>
+                <div class="chart-content" id="chart10"></div>
+            </div>
+            <div class="chart-card page1-left-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">聚类散点图 K-Means</div>
+
+                </div>
+                <div class="chart-content" id="chart4"></div>
+            </div>
+            
+            <!-- 中间 -->
+            <div class="page1-center">
+                <div class="page1-center-top">
+                    <div class="taxi-model-container">
+                        <canvas id="taxi-3d-canvas"></canvas>
+                        <div class="kpi-sides">
+                            <div class="kpi-column">
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiTotal">--</div>
+                                    <div class="kpi-label">总行程数</div>
+                                </div>
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiYellow">--</div>
+                                    <div class="kpi-label">Yellow出租车</div>
+                                </div>
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiGreen">--</div>
+                                    <div class="kpi-label">Green出租车</div>
+                                </div>
+                            </div>
+                            <div class="kpi-column">
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiFare">--</div>
+                                    <div class="kpi-label">平均票价 ($)</div>
+                                </div>
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiDist">--</div>
+                                    <div class="kpi-label">平均距离 (mi)</div>
+                                </div>
+                                <div class="kpi-item">
+                                    <div class="kpi-value" id="kpiDur">--</div>
+                                    <div class="kpi-label">平均时长 (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="page1-center-bottom" id="detailTableCard" ondblclick="openTableFullscreen()">
+                    <div class="chart-header">
+                        <div class="chart-title">详细数据表格</div>
+    
+                    </div>
+                    <div class="chart-content" id="detailTableContainer" style="overflow: auto; padding: 4px;">
+                        <table class="data-table" id="detailTable">
+                            <thead><tr id="detailTableHeader"></tr></thead>
+                            <tbody id="detailTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 右侧 -->
+            <div class="chart-card page1-right-top">
+                <div class="chart-header">
+                    <div class="chart-title">数据清洗处理热力图</div>
+
+                </div>
+                <div class="chart-content" id="chart2"></div>
+            </div>
+            <div class="chart-card page1-right-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">字段相关性热力图</div>
+
+                </div>
+                <div class="chart-content" id="chart3"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第二页：趋势分析 -->
+    <div class="page" id="page2">
+        <div class="page2-grid">
+            <!-- 左侧 -->
+            <div class="chart-card page2-left-top">
+                <div class="chart-header">
+                    <div class="chart-title">支付方式占比</div>
+
+                </div>
+                <div class="chart-content" id="chart7"></div>
+            </div>
+            <div class="chart-card page2-left-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">24小时行程分布</div>
+
+                </div>
+                <div class="chart-content" id="chart6"></div>
+            </div>
+            
+            <!-- 中间 -->
+            <div class="chart-card page2-center-top">
+                <div class="chart-header">
+                    <div class="chart-title">各区域行程量排名</div>
+                </div>
+                <div class="chart-content" id="chart14"></div>
+            </div>
+            <div class="chart-card page2-center-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">月度行程趋势分析</div>
+
+                </div>
+                <div class="chart-content" id="chart5"></div>
+            </div>
+            
+            <!-- 右侧 -->
+            <div class="chart-card page2-right-top">
+                <div class="chart-header">
+                    <div class="chart-title">票价箱线图</div>
+
+                </div>
+                <div class="chart-content" id="chart9"></div>
+            </div>
+            <div class="chart-card page2-right-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">行程距离分布</div>
+                </div>
+                <div class="chart-content" id="chart8"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 第三页：地理分布 -->
+    <div class="page" id="page3">
+        <div class="page3-grid">
+            <!-- 左侧 -->
+            <div class="chart-card page3-left">
+                <div class="chart-header">
+                    <div class="chart-title">纽约市行程热力地图</div>
+
+                </div>
+                <div class="chart-content" id="chart16"></div>
+            </div>
+            
+            <!-- 中间 -->
+            <div class="chart-card page3-center-top">
+                <div class="chart-header">
+                    <div class="chart-title">OD桑基图</div>
+                </div>
+                <div class="chart-content" id="chart13"></div>
+            </div>
+            <div class="chart-card page3-center-middle">
+                <div class="chart-header">
+                    <div class="chart-title">天气与行程量联动分析</div>
+
+                </div>
+                <div class="chart-content" id="chart15"></div>
+            </div>
+            <div class="chart-card page3-center-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">行程量预测 vs 实际</div>
+
+                </div>
+                <div class="chart-content" id="chart11"></div>
+            </div>
+            
+            <!-- 右侧 -->
+            <div class="chart-card page3-right-top">
+                <div class="chart-header">
+                    <div class="chart-title">热门上车区域 Top 15</div>
+
+                </div>
+                <div class="chart-content" id="chart17"></div>
+            </div>
+            <div class="chart-card page3-right-middle">
+                <div class="chart-header">
+                    <div class="chart-title">预测残差分布</div>
+                </div>
+                <div class="chart-content" id="chart12"></div>
+            </div>
+            <div class="chart-card page3-right-bottom">
+                <div class="chart-header">
+                    <div class="chart-title">区域对比分析</div>
+                </div>
+                <div class="chart-content" id="chart18"></div>
+            </div>
+        </div>
+    </div>
+    
+</div>
+
+<script>
+// ========== 双击放大功能 ==========
+let fullscreenChart = null;
+
+function openFullscreen(chartId, title) {
+    const overlay = document.getElementById('fullscreenOverlay');
+    const container = document.getElementById('fullscreenChart');
+    const titleEl = document.getElementById('fullscreenTitle');
+    
+    titleEl.textContent = title;
+    overlay.classList.add('active');
+    
+    if (fullscreenChart) {
+        fullscreenChart.dispose();
+        fullscreenChart = null;
+    }
+    
+    fullscreenChart = echarts.init(container, null, { renderer: 'canvas' });
+    
+    const originalChart = charts[chartId];
+    if (originalChart) {
+        const option = originalChart.getOption();
+        // 深拷贝option以保留回调函数
+        function deepClone(obj) {
+            if (obj === null || typeof obj !== 'object') return obj;
+            if (typeof obj === 'function') return obj;
+            if (Array.isArray(obj)) return obj.map(deepClone);
+            const clone = {};
+            for (const key in obj) {
+                if (obj.hasOwnProperty(key)) {
+                    clone[key] = deepClone(obj[key]);
+                }
+            }
+            return clone;
+        }
+        const enlargedOption = deepClone(option);
+        if (enlargedOption.title) {
+            enlargedOption.title.forEach(t => {
+                if (t.textStyle) t.textStyle.fontSize = 22;
+                if (t.subtextStyle) t.subtextStyle.fontSize = 16;
+            });
+        }
+        if (enlargedOption.legend) {
+            enlargedOption.legend.forEach(l => {
+                if (l.textStyle) l.textStyle.fontSize = 16;
+            });
+        }
+        if (enlargedOption.xAxis) {
+            enlargedOption.xAxis.forEach(x => {
+                if (x.nameTextStyle) x.nameTextStyle.fontSize = 16;
+                if (x.axisLabel) x.axisLabel.fontSize = 14;
+            });
+        }
+        if (enlargedOption.yAxis) {
+            enlargedOption.yAxis.forEach(y => {
+                if (y.nameTextStyle) y.nameTextStyle.fontSize = 16;
+                if (y.axisLabel) y.axisLabel.fontSize = 14;
+            });
+        }
+        if (enlargedOption.visualMap) {
+            enlargedOption.visualMap.forEach(v => {
+                if (v.textStyle) v.textStyle.fontSize = 14;
+            });
+        }
+        if (enlargedOption.series) {
+            enlargedOption.series.forEach(s => {
+                if (s.label && s.label.fontSize) s.label.fontSize = 14;
+                if (s.label && s.label.show !== undefined) s.label.fontSize = 14;
+            });
+        }
+        fullscreenChart.setOption(enlargedOption);
+        
+        // 添加滚轮缩放功能
+        fullscreenChart.setOption({
+            dataZoom: [
+                {
+                    type: 'inside',
+                    xAxisIndex: [0],
+                    start: 0,
+                    end: 100,
+                    zoomOnMouseWheel: true,
+                    moveOnMouseMove: true
+                },
+                {
+                    type: 'inside',
+                    yAxisIndex: [0],
+                    start: 0,
+                    end: 100,
+                    zoomOnMouseWheel: true,
+                    moveOnMouseMove: true
+                }
+            ]
+        });
+    }
+    
+    setTimeout(() => fullscreenChart.resize(), 100);
+}
+
+function closeFullscreen(event) {
+    if (event.target.id === 'fullscreenOverlay' || 
+        event.target.classList.contains('fs-close') ||
+        event.target.closest('.fs-close')) {
+        const overlay = document.getElementById('fullscreenOverlay');
+        overlay.classList.remove('active');
+        if (fullscreenChart) {
+            fullscreenChart.dispose();
+            fullscreenChart = null;
+        }
+    }
+}
+
+// ========== 表格双击放大功能 ==========
+function openTableFullscreen() {
+    const overlay = document.getElementById('tableFullscreenOverlay');
+    const headerRow = document.getElementById('fullscreenTableHeader');
+    const tbody = document.getElementById('fullscreenTableBody');
+    
+    // 复制表格内容到放大视图
+    const originalHeader = document.getElementById('detailTableHeader');
+    const originalBody = document.getElementById('detailTableBody');
+    
+    if (originalHeader && originalBody) {
+        headerRow.innerHTML = originalHeader.innerHTML;
+        tbody.innerHTML = originalBody.innerHTML;
+    }
+    
+    overlay.classList.add('active');
+}
+
+function closeTableFullscreen(event) {
+    if (event.target.id === 'tableFullscreenOverlay' || 
+        event.target.classList.contains('fs-close') ||
+        event.target.closest('.fs-close')) {
+        const overlay = document.getElementById('tableFullscreenOverlay');
+        overlay.classList.remove('active');
+    }
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        const overlay = document.getElementById('fullscreenOverlay');
+        const tableOverlay = document.getElementById('tableFullscreenOverlay');
+        if (overlay.classList.contains('active')) {
+            overlay.classList.remove('active');
+            if (fullscreenChart) {
+                fullscreenChart.dispose();
+                fullscreenChart = null;
+            }
+        }
+        if (tableOverlay.classList.contains('active')) {
+            tableOverlay.classList.remove('active');
+        }
+    }
+});
+
+// ========== Global State ==========
+const charts = {};
+const DATA_BASE = '/dashboard_data/';
+let currentMonth = 0;
+let currentPage = 1;
+
+// ========== Utility ==========
+async function loadJSON(filename) {
+    const resp = await fetch(DATA_BASE + filename);
+    if (!resp.ok) throw new Error(`加载失败 ${filename}: ${resp.status}`);
+    return resp.json();
+}
+
+function formatNum(n) {
+    if (n >= 1e6) return (n / 1e6).toFixed(1) + 'M';
+    if (n >= 1e3) return (n / 1e3).toFixed(1) + 'K';
+    return n.toFixed(0);
+}
+
+function initChart(domId) {
+    const dom = document.getElementById(domId);
+    if (!dom) return null;
+    const chart = echarts.init(dom, null, { renderer: 'canvas' });
+    chart.setOption({ backgroundColor: 'transparent' });
+    charts[domId] = chart;
+    window.addEventListener('resize', () => chart.resize());
+    return chart;
+}
+
+// ========== Page Switching ==========
+function switchPage(pageNum) {
+    currentPage = pageNum;
+    
+    document.querySelectorAll('.page-btn').forEach(btn => {
+        btn.classList.toggle('active', parseInt(btn.dataset.page) === pageNum);
+    });
+    
+    document.querySelectorAll('.page').forEach((page, idx) => {
+        page.classList.toggle('active', idx === pageNum - 1);
+    });
+    
+    setTimeout(() => {
+        Object.values(charts).forEach(chart => {
+            try { chart.resize(); } catch(e) {}
+        });
+        // 第二页的图表在隐藏时可能未正确渲染，切换到第二页时强制重新渲染
+        if (pageNum === 2 && regionRankingData) {
+            // 如果chart14存在但容器可能宽高为0，dispose后重新初始化
+            if (charts['chart14']) {
+                try { charts['chart14'].dispose(); } catch(e) {}
+                delete charts['chart14'];
+            }
+            renderChart14();
+        }
+    }, 150);
+}
+
+// ========== 3D Taxi Model ==========
+let taxiScene, taxiCamera, taxiRenderer, taxiModel;
+let THREE, GLTFLoader;
+
+async function init3DTaxi() {
+    const threeModule = await import('three');
+    THREE = threeModule;
+    const gltfModule = await import('three/addons/loaders/GLTFLoader.js');
+    GLTFLoader = gltfModule.GLTFLoader;
+    const orbitModule = await import('three/addons/controls/OrbitControls.js');
+    const OrbitControls = orbitModule.OrbitControls;
+    
+    const canvas = document.getElementById('taxi-3d-canvas');
+    if (!canvas) return;
+    
+    taxiScene = new THREE.Scene();
+    taxiScene.background = null;
+    
+    const width = canvas.clientWidth;
+    const height = canvas.clientHeight;
+    taxiCamera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
+    taxiCamera.position.set(0, 2, 5);
+    taxiCamera.lookAt(0, 0, 0);
+    
+    taxiRenderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+    taxiRenderer.setSize(width, height);
+    taxiRenderer.setPixelRatio(window.devicePixelRatio);
+    
+    // 添加OrbitControls - 支持鼠标缩放、旋转、平移
+    const controls = new OrbitControls(taxiCamera, taxiRenderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.enableZoom = true;
+    controls.enableRotate = true;
+    controls.enablePan = true;
+    controls.minDistance = 2;
+    controls.maxDistance = 15;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1.5;
+    window.taxiControls = controls;
+    
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    taxiScene.add(ambientLight);
+    
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(5, 10, 7);
+    taxiScene.add(dirLight);
+    
+    const pointLight = new THREE.PointLight(0x00E5FF, 0.5);
+    pointLight.position.set(-5, 5, -5);
+    taxiScene.add(pointLight);
+    
+    const loader = new GLTFLoader();
+    loader.load('/dashboard_data/taxi.glb', 
+        function(gltf) {
+            taxiModel = gltf.scene;
+            const box = new THREE.Box3().setFromObject(taxiModel);
+            const center = box.getCenter(new THREE.Vector3());
+            const size = box.getSize(new THREE.Vector3());
+            
+            const maxDim = Math.max(size.x, size.y, size.z);
+            const scale = 2 / maxDim;
+            taxiModel.scale.setScalar(scale);
+            
+            taxiModel.position.sub(center.multiplyScalar(scale));
+            taxiModel.position.y = -0.5;
+            
+            taxiScene.add(taxiModel);
+            animateTaxi(controls);
+        },
+        undefined,
+        function(error) {
+            console.error('Error loading taxi model:', error);
+            createFallbackTaxi();
+            animateTaxi(controls);
+        }
+    );
+    
+    window.addEventListener('resize', () => {
+        const width = canvas.clientWidth;
+        const height = canvas.clientHeight;
+        taxiCamera.aspect = width / height;
+        taxiCamera.updateProjectionMatrix();
+        taxiRenderer.setSize(width, height);
+    });
+}
+
+function createFallbackTaxi() {
+    const taxiGroup = new THREE.Group();
+    
+    const bodyGeo = new THREE.BoxGeometry(2, 0.6, 1);
+    const bodyMat = new THREE.MeshStandardMaterial({ color: 0xF4D03F, metalness: 0.3, roughness: 0.4 });
+    const body = new THREE.Mesh(bodyGeo, bodyMat);
+    body.position.y = 0.3;
+    taxiGroup.add(body);
+    
+    const cabinGeo = new THREE.BoxGeometry(1.2, 0.5, 0.9);
+    const cabinMat = new THREE.MeshStandardMaterial({ color: 0xF4D03F, metalness: 0.3, roughness: 0.4 });
+    const cabin = new THREE.Mesh(cabinGeo, cabinMat);
+    cabin.position.set(-0.2, 0.85, 0);
+    taxiGroup.add(cabin);
+    
+    const windowGeo = new THREE.BoxGeometry(1.25, 0.35, 0.85);
+    const windowMat = new THREE.MeshStandardMaterial({ color: 0x1a1a2e, metalness: 0.8, roughness: 0.1 });
+    const windows = new THREE.Mesh(windowGeo, windowMat);
+    windows.position.set(-0.2, 0.85, 0);
+    taxiGroup.add(windows);
+    
+    const wheelGeo = new THREE.CylinderGeometry(0.25, 0.25, 0.15, 16);
+    const wheelMat = new THREE.MeshStandardMaterial({ color: 0x1a1a1a });
+    const wheelPositions = [
+        [0.7, 0.25, 0.5], [0.7, 0.25, -0.5],
+        [-0.7, 0.25, 0.5], [-0.7, 0.25, -0.5]
+    ];
+    wheelPositions.forEach(pos => {
+        const wheel = new THREE.Mesh(wheelGeo, wheelMat);
+        wheel.rotation.z = Math.PI / 2;
+        wheel.position.set(...pos);
+        taxiGroup.add(wheel);
+    });
+    
+    taxiModel = taxiGroup;
+    taxiScene.add(taxiModel);
+    
+    animateTaxi();
+}
+
+function animateTaxi(controls) {
+    if (!taxiModel) return;
+    // 使用OrbitControls处理旋转和缩放
+    if (controls) {
+        controls.update();
+    }
+    taxiRenderer.render(taxiScene, taxiCamera);
+    requestAnimationFrame(() => animateTaxi(controls));
+}
+
+// ========== Chart Renderers ==========
+async function renderKPIs() {
+    try {
+        const d = await loadJSON('chart_1_kpi.json');
+        document.getElementById('kpiTotal').textContent = formatNum(d.total_trips);
+        document.getElementById('kpiYellow').textContent = formatNum(d.yellow_trips);
+        document.getElementById('kpiGreen').textContent = formatNum(d.green_trips);
+        document.getElementById('kpiFare').textContent = '$' + d.avg_fare;
+        document.getElementById('kpiDist').textContent = d.avg_distance + ' mi';
+        document.getElementById('kpiDur').textContent = d.avg_duration_min + ' min';
+    } catch(e) { console.error('KPI加载失败:', e); }
+}
+
+async function renderChart2() {
+    const chart = initChart('chart2');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_2_cleaning.json');
+        const rules = d.rules.map(r => r.rule);
+        const companies = d.companies;
+        const heatmapData = [];
+        d.rules.forEach((item, ruleIdx) => {
+            heatmapData.push([0, ruleIdx, item.green_pct]);
+            heatmapData.push([1, ruleIdx, item.yellow_pct]);
+        });
+        const maxPct = Math.max(...d.rules.map(r => Math.max(r.green_pct, r.yellow_pct)));
+        
+        chart.setOption({
+            title: { 
+                text: `原始数据 → 清洗后数据`, 
+                subtext: `Green: ${(d.summary.original.Green/1e6).toFixed(2)}M → ${(d.summary.cleaned.Green/1e6).toFixed(2)}M | Yellow: ${(d.summary.original.Yellow/1e6).toFixed(1)}M → ${(d.summary.cleaned.Yellow/1e6).toFixed(1)}M`,
+                left: 'center', 
+                top: 0,
+                textStyle: { color: '#fff', fontSize: 10 },
+                subtextStyle: { color: '#aaa', fontSize: 8 }
+            },
+            tooltip: {
+                formatter: function(p) {
+                    const compIdx = p.data[0];
+                    const ruleIdx = p.data[1];
+                    const ruleData = d.rules[ruleIdx];
+                    const companyName = companies[compIdx];
+                    const pct = p.data[2];
+                    const count = compIdx === 0 ? ruleData.green_removed : ruleData.yellow_removed;
+                    return `<b>${companyName}</b><br/>规则: ${ruleData.rule}<br/>移除: <b>${count.toLocaleString()}</b> (${pct.toFixed(3)}%)`;
+                }
+            },
+            grid: { left: 140, right: 35, top: 50, bottom: 50 },
+            xAxis: { 
+                type: 'category', 
+                data: companies, 
+                name: '出租车类型', 
+                nameLocation: 'middle',
+                nameGap: 25,
+                nameTextStyle: { color: '#ccc', fontSize: 10 },
+                axisLabel: { color: '#889', fontSize: 9 } 
+            },
+            yAxis: { 
+                type: 'category', 
+                data: rules, 
+                name: '清洗规则', 
+                nameLocation: 'middle',
+                nameGap: 160,
+                nameTextStyle: { color: '#ccc', fontSize: 10 },
+                axisLabel: { color: '#889', fontSize: 7, interval: 0 },
+                inverse: true
+            },
+            visualMap: {
+                min: 0, 
+                max: Math.max(maxPct * 1.2, 0.01),
+                calculable: true,
+                orient: 'horizontal', 
+                left: 'center', 
+                bottom: 0,
+                itemWidth: 10,
+                itemHeight: 60,
+                textStyle: { color: '#ccc', fontSize: 8 },
+                inRange: { color: ['#0a1f30', '#1a4a6a', '#2a6a9a', '#f5af19', '#f12711'] }
+            },
+            series: [{
+                type: 'heatmap', 
+                data: heatmapData,
+                label: { show: true, fontSize: 7, formatter: p => p.data[2].toFixed(1) + '%', color: '#fff' },
+            }]
+        });
+    } catch(e) { console.error('图表2失败:', e); }
+}
+
+async function renderChart3() {
+    const chart = initChart('chart3');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_3_correlation.json');
+        chart.setOption({
+            tooltip: { formatter: p => `${d.labels[p.data[0]]} × ${d.labels[p.data[1]]}<br/>r = <b>${p.data[2].toFixed(3)}</b>` },
+            grid: { left: 60, right: 20, top: 20, bottom: 80 },
+            xAxis: { type: 'category', data: d.labels, axisLabel: { rotate: 60, fontSize: 7, color: '#889', interval: 0 } },
+            yAxis: { type: 'category', data: d.labels, axisLabel: { fontSize: 8, color: '#889', interval: 0 } },
+            visualMap: {
+                min: -1, max: 1, calculable: true,
+                orient: 'horizontal', left: 'center', bottom: 0,
+                itemWidth: 10,
+                itemHeight: 60,
+                inRange: { color: ['#313695','#4575b4','#74add1','#abd9e9','#fee090','#fdae61','#f46d43','#d73027'] }
+            },
+            series: [{
+                type: 'heatmap',
+                data: d.matrix.flatMap((row, i) => row.map((v, j) => [j, i, v])),
+                label: { show: true, fontSize: 8, formatter: p => p.data[2].toFixed(2) },
+            }]
+        });
+    } catch(e) { console.error('图表3失败:', e); }
+}
+
+async function renderChart4() {
+    const chart = initChart('chart4');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_4_clustering.json');
+        const colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666'];
+        const clusterNames = ['短途低价', '中途经济', '长途高费', '短途高费'];
+        const series = [0,1,2,3].map(c => ({
+            type: 'scatter', name: clusterNames[c],
+            data: d.points.filter(p => p.cluster === c).map(p => [p.x, p.y, p.duration]),
+            symbolSize: 3,
+            itemStyle: { color: colors[c], opacity: 0.6 },
+        }));
+        series.push({
+            type: 'scatter', name: '聚类中心',
+            data: d.centers.map(c => [c.distance, c.fare, c.duration]),
+            symbolSize: 12,
+            itemStyle: { color: '#fff', borderColor: '#000', borderWidth: 2 },
+            label: { show: true, formatter: p => `C${p.dataIndex}`, color: '#fff', fontSize: 9 }
+        });
+        chart.setOption({
+            tooltip: { formatter: p => `距离: <b>${p.data[0].toFixed(2)}mi</b><br/>票价: <b>$${p.data[1].toFixed(2)}</b><br/>时长: <b>${p.data[2].toFixed(0)}min</b>` },
+            grid: { left: 55, right: 25, top: 25, bottom: 60 },
+            xAxis: { 
+                type: 'value', 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '票价 ($)', 
+                nameLocation: 'middle',
+                nameGap: 45,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            legend: { 
+                bottom: 0, 
+                textStyle: { color: '#889', fontSize: 10 },
+                itemGap: 8,
+                itemWidth: 12
+            },
+            series: series,
+        });
+    } catch(e) { console.error('图表4失败:', e); }
+}
+
+let monthlyTrendData = null;
+async function renderChart5() {
+    const chart = initChart('chart5');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_5_monthly_trend.json');
+        monthlyTrendData = d;
+        updateChart5Highlight(chart, d, currentMonth);
+    } catch(e) { console.error('图表5失败:', e); }
+}
+
+function updateChart5Highlight(chart, d, month) {
+    const yellowColors = d.yellow.map((_, i) => month > 0 && i === month - 1 ? '#3b82f6' : '#f5af19');
+    const greenColors = d.green.map((_, i) => month > 0 && i === month - 1 ? '#22c55e' : '#3cb371');
+    chart.setOption({
+        tooltip: { trigger: 'axis' },
+        legend: { data: ['Yellow出租车', 'Green出租车'], bottom: 0, textStyle: { color: '#889', fontSize: 9 } },
+        grid: { left: 65, right: 65, top: 25, bottom: 50 },
+        xAxis: { 
+            type: 'category', 
+            data: d.month_labels, 
+            axisLabel: { fontSize: 9, color: '#889' } 
+        },
+        yAxis: [
+            { 
+                type: 'value', 
+                name: 'Yellow数量', 
+                nameLocation: 'middle',
+                nameGap: 50,
+                nameTextStyle: { color: '#f5af19', fontSize: 10 }, 
+                position: 'left', 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            { 
+                type: 'value', 
+                name: 'Green数量', 
+                nameLocation: 'middle',
+                nameGap: 50,
+                nameTextStyle: { color: '#3cb371', fontSize: 10 }, 
+                position: 'right', 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            }
+        ],
+        series: [
+            { name: 'Yellow出租车', type: 'bar', data: d.yellow, yAxisIndex: 0, itemStyle: { color: (p) => yellowColors[p.dataIndex] } },
+            { name: 'Green出租车', type: 'line', data: d.green, yAxisIndex: 1, itemStyle: { color: (p) => greenColors[p.dataIndex] }, lineStyle: { color: '#3cb371' }, smooth: true }
+        ],
+    });
+}
+
+async function renderChart6() {
+    const chart = initChart('chart6');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_6_hourly.json');
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { 
+                data: ['Yellow出租车', 'Green出租车'], 
+                bottom: 0, 
+                textStyle: { color: '#889', fontSize: 9 },
+                itemGap: 20
+            },
+            grid: { left: 55, right: 55, top: 20, bottom: 50 },
+            xAxis: { 
+                type: 'category', 
+                data: d.hour_labels, 
+                axisLabel: { fontSize: 8, rotate: 45, color: '#889' } 
+            },
+            yAxis: [
+                { 
+                    type: 'value', 
+                    name: 'Yellow数量', 
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    nameTextStyle: { color: '#f5af19', fontSize: 9 }, 
+                    position: 'left', 
+                    axisLabel: { fontSize: 8, color: '#889' } 
+                },
+                { 
+                    type: 'value', 
+                    name: 'Green数量', 
+                    nameLocation: 'middle',
+                    nameGap: 40,
+                    nameTextStyle: { color: '#3cb371', fontSize: 9 }, 
+                    position: 'right', 
+                    axisLabel: { fontSize: 8, color: '#889' } 
+                }
+            ],
+            series: [
+                { name: 'Yellow出租车', type: 'bar', data: d.yellow, itemStyle: { color: '#f5af19' } },
+                { name: 'Green出租车', type: 'line', data: d.green, itemStyle: { color: '#3cb371' }, smooth: true, yAxisIndex: 1 }
+            ],
+        });
+    } catch(e) { console.error('图表6失败:', e); }
+}
+
+async function renderChart7() {
+    const chart = initChart('chart7');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_7_payment.json');
+        const payNames = {'Credit Card': '信用卡', 'Cash': '现金'};
+        chart.setOption({
+            tooltip: { trigger: 'item', formatter: '{b}: {c} ({d}%)' },
+            legend: { bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
+            series: [
+                {
+                    name: 'Yellow', type: 'pie',
+                    radius: ['25%', '45%'], center: ['30%', '50%'],
+                    data: d.yellow.map(i => ({...i, name: payNames[i.name] || i.name})),
+                    label: { formatter: '{b}\n{d}%', fontSize: 9 },
+                    itemStyle: { borderRadius: 3 }
+                },
+                {
+                    name: 'Green', type: 'pie',
+                    radius: ['25%', '45%'], center: ['75%', '50%'],
+                    data: d.green.map(i => ({...i, name: payNames[i.name] || i.name})),
+                    label: { formatter: '{b}\n{d}%', fontSize: 9 },
+                    itemStyle: { borderRadius: 3 }
+                }
+            ],
+            graphic: [
+                { type: 'text', left: '18%', top: '8%', style: { text: 'Yellow', fill: '#f5af19', fontSize: 10 } },
+                { type: 'text', left: '68%', top: '8%', style: { text: 'Green', fill: '#3cb371', fontSize: 10 } }
+            ]
+        });
+    } catch(e) { console.error('图表7失败:', e); }
+}
+
+async function renderChart8() {
+    const chart = initChart('chart8');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_8_distance.json');
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            grid: { left: 55, right: 25, top: 25, bottom: 55 },
+            xAxis: { 
+                type: 'category', 
+                data: d.bins.map(b => b < 1 ? b.toFixed(1) : b.toFixed(0)), 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '行程数量', 
+                nameLocation: 'middle',
+                nameGap: 45,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            series: [{
+                type: 'bar', data: d.counts,
+                itemStyle: { color: new echarts.graphic.LinearGradient(0,0,0,1, [{offset:0,color:'#f5af19'},{offset:1,color:'#f12711'}]) },
+            }]
+        });
+    } catch(e) { console.error('图表8失败:', e); }
+}
+
+async function renderChart9() {
+    const chart = initChart('chart9');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_9_fare_box.json');
+        // 箱线图数据：[min, Q1, median, Q3, max]
+        const yellowData = [d.yellow.min, d.yellow.q1, d.yellow.median, d.yellow.q3, d.yellow.max];
+        const greenData = [d.green.min, d.green.q1, d.green.median, d.green.q3, d.green.max];
+        
+        chart.setOption({
+            title: {
+                text: '基础票价均值: Yellow $' + d.yellow.mean.toFixed(2) + ' | Green $' + d.green.mean.toFixed(2) + '（不含小费等附加费用）',
+                left: 'center',
+                top: 5,
+                textStyle: { color: '#889', fontSize: 9 }
+            },
+            tooltip: {
+                trigger: 'item',
+                formatter: function(params) {
+                    const data = params.data;
+                    return `<b>${params.seriesName}</b><br/>
+                            最小值: $${data[1]}<br/>
+                            Q1: $${data[2]}<br/>
+                            中位数: $${data[3]}<br/>
+                            Q3: $${data[4]}<br/>
+                            最大值: $${data[5]}`;
+                }
+            },
+            grid: { left: 55, right: 20, top: 35, bottom: 40 },
+            xAxis: { 
+                type: 'category', 
+                data: ['Yellow出租车', 'Green出租车'], 
+                axisLabel: { fontSize: 10, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '票价 ($)', 
+                nameLocation: 'middle',
+                nameGap: 40,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            series: [
+                {
+                    name: 'Yellow出租车',
+                    type: 'boxplot',
+                    data: [yellowData],
+                    itemStyle: { color: 'rgba(245,175,25,0.6)', borderColor: '#f5af19', borderWidth: 2 },
+                    boxWidth: ['25%', '25%']
+                },
+                {
+                    name: 'Green出租车',
+                    type: 'boxplot',
+                    data: [greenData],
+                    itemStyle: { color: 'rgba(60,179,113,0.6)', borderColor: '#3cb371', borderWidth: 2 },
+                    boxWidth: ['25%', '25%']
+                }
+            ],
+            legend: {
+                data: ['Yellow出租车', 'Green出租车'],
+                bottom: 0,
+                textStyle: { color: '#889', fontSize: 9 }
+            }
+        });
+    } catch(e) { console.error('图表9失败:', e); }
+}
+
+async function renderChart10() {
+    const chart = initChart('chart10');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_10_radar.json');
+        const indicators = [
+            { name: '距离', max: 100 }, { name: '票价', max: 100 },
+            { name: '时长', max: 100 }, { name: '数量', max: 100 }
+        ];
+        // 根据真实数据标注聚类群体
+        // Cluster 0: 短途低价(距离1.21mi, 票价$7.01, 29195趟) - 最大群体
+        // Cluster 1: 中途经济(距离7.98mi, 票价$28.59, 4986趟)
+        // Cluster 2: 中途偏长(距离3.28mi, 票价$14.78, 14195趟)
+        // Cluster 3: 长途高费(距离16.96mi, 票价$53.35, 1624趟) - 最小群体
+        const clusterLabels = d.data.map((c, i) => {
+            return `${c.cluster}: ${c.raw_distance.toFixed(1)}mi / $${c.raw_fare.toFixed(0)} / ${c.raw_count}趟`;
+        });
+        const clusterShortNames = ['短途低价', '中途偏长', '中途经济', '长途高费'];
+        const colors = ['#5470c6', '#91cc75', '#fac858', '#ee6666'];
+        
+        chart.setOption({
+            title: {
+                text: '聚类群体特征（基于K-Means算法）',
+                left: 'center',
+                top: 5,
+                textStyle: { color: '#889', fontSize: 9 }
+            },
+            tooltip: {
+                formatter: function(params) {
+                    const c = d.data[params.dataIndex];
+                    return `<b>${clusterShortNames[params.dataIndex]}</b><br/>
+                            平均距离: ${c.raw_distance.toFixed(2)} mi<br/>
+                            平均票价: $${c.raw_fare.toFixed(2)}<br/>
+                            平均时长: ${c.raw_duration.toFixed(1)} min<br/>
+                            行程数量: ${c.raw_count.toLocaleString()}`;
+                }
+            },
+            legend: { 
+                data: clusterLabels, 
+                bottom: 0, 
+                textStyle: { color: '#889', fontSize: 8 },
+                itemWidth: 12,
+                itemHeight: 8
+            },
+            radar: { 
+                indicator: indicators, 
+                axisName: { color: '#889', fontSize: 9 }, 
+                radius: '55%',
+                center: ['50%', '50%']
+            },
+            series: [{
+                type: 'radar',
+                data: d.data.map((c, i) => ({
+                    name: clusterLabels[i],
+                    value: [c.distance, c.fare, c.duration, c.popularity],
+                    itemStyle: { color: colors[i] },
+                    areaStyle: { opacity: 0.1 }
+                }))
+            }]
+        });
+    } catch(e) { console.error('图表10失败:', e); }
+}
+
+async function renderChart11() {
+    const chart = initChart('chart11');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_11_prediction.json');
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['实际值', '预测值'], bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
+            grid: { left: 55, right: 25, top: 25, bottom: 55 },
+            xAxis: { 
+                type: 'category', 
+                data: d.month_labels, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '行程数量', 
+                nameLocation: 'middle',
+                nameGap: 45,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            series: [
+                { name: '实际值', type: 'bar', data: d.actual, itemStyle: { color: '#5470c6' } },
+                { name: '预测值', type: 'line', data: d.predicted, itemStyle: { color: '#f12711' }, lineStyle: { type: 'dashed' } },
+            ]
+        });
+    } catch(e) { console.error('图表11失败:', e); }
+}
+
+async function renderChart12() {
+    const chart = initChart('chart12');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_12_residuals.json');
+        const residualsM = d.residuals.map(r => (r / 1000000).toFixed(2));
+        chart.setOption({
+            tooltip: { trigger: 'axis', formatter: p => `${p[0].name}<br/>残差: <b>${p[0].data}M</b>` },
+            grid: { left: 55, right: 25, top: 25, bottom: 55 },
+            xAxis: { 
+                type: 'category', 
+                data: d.labels, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '残差 (百万行程)', 
+                nameLocation: 'middle',
+                nameGap: 50,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889', formatter: '{value}M' } 
+            },
+            series: [{
+                type: 'bar', data: residualsM.map((r,i) => ({
+                    value: parseFloat(r),
+                    itemStyle: { color: d.residuals[i] > 0 ? '#91cc75' : '#ee6666' }
+                })),
+                markLine: { data: [{ yAxis: 0, label: { show: false } }], silent: true }
+            }]
+        });
+    } catch(e) { console.error('图表12失败:', e); }
+}
+
+async function renderChart13() {
+    const chart = initChart('chart13');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_13_sankey.json');
+        const boroColors = {
+            'Manhattan': '#f5af19', 'Queens': '#3cb371', 'Brooklyn': '#e74c3c',
+            'Bronx': '#3498db', 'Unknown': '#7f8c8d', 'EWR': '#9b59b6', 'Staten Island': '#1abc9c'
+        };
+        function getColor(name) {
+            for (const [key, color] of Object.entries(boroColors)) {
+                if (name.includes(key)) return color;
+            }
+            return '#889';
+        }
+        const coloredNodes = d.nodes.map(n => ({ ...n, itemStyle: { color: getColor(n.name) } }));
+        chart.setOption({
+            tooltip: { trigger: 'item', triggerOn: 'mousemove' },
+            series: [{
+                type: 'sankey',
+                layout: 'none',
+                emphasis: { focus: 'adjacency' },
+                nodeAlign: 'justify',
+                nodeWidth: 12,
+                nodeGap: 8,
+                layoutIterations: 0,
+                data: coloredNodes,
+                links: d.links,
+                label: { fontSize: 8, color: '#ccc' },
+                lineStyle: { color: 'gradient', curveness: 0.5, opacity: 0.4 }
+            }]
+        });
+    } catch(e) { console.error('图表13失败:', e); }
+}
+
+let regionRankingData = null;
+async function renderChart14() {
+    const chart = initChart('chart14');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_14_regions.json');
+        regionRankingData = d;
+        updateChart14(chart, d, currentMonth);
+    } catch(e) { console.error('图表14失败:', e); }
+}
+
+function updateChart14(chart, d, month) {
+    if (!chart) return;
+    // 数据中borough_ranking已经是中文区名，直接使用
+    let data;
+    if (month === 0) {
+        data = d.borough_ranking;
+    } else {
+        data = d.monthly_borough_ranking[String(month)];
+    }
+    if (!data) {
+        console.warn('区域排名数据不存在, month:', month);
+        return;
+    }
+    // 先clear再setOption，确保数据完全更新
+    chart.clear();
+    chart.setOption({
+        tooltip: { 
+            trigger: 'axis', 
+            axisPointer: { type: 'shadow' },
+            formatter: function(params) {
+                return `<b>${params.name}</b><br/>行程数量: <b>${params.data.toLocaleString()}</b>`;
+            }
+        },
+        grid: { left: 60, right: 55, top: 15, bottom: 25 },
+        xAxis: { 
+            type: 'value', 
+            axisLabel: { fontSize: 9, formatter: formatNum, color: '#889' } 
+        },
+        yAxis: { 
+            type: 'category', 
+            data: data.map(d => d.name), 
+            inverse: true, 
+            axisLabel: { fontSize: 10, color: '#889' } 
+        },
+        series: [{
+            type: 'bar', 
+            data: data.map(d => d.value),
+            itemStyle: { color: new echarts.graphic.LinearGradient(0,0,1,0, [{offset:0,color:'#3cb371'},{offset:1,color:'#2e8b57'}]) },
+            label: { show: true, position: 'right', formatter: p => formatNum(p.data), color: '#889', fontSize: 9 }
+        }]
+    });
+}
+
+async function renderChart15() {
+    const chart = initChart('chart15');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_15_weather.json');
+        const m = d.monthly;
+        const months = ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月'];
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['平均温度(F)', '降雨天数', '日均行程量'], bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
+            grid: { left: 50, right: 50, top: 20, bottom: 55 },
+            xAxis: { 
+                type: 'category', 
+                data: months, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            yAxis: [
+                { 
+                    type: 'value', 
+                    name: '温度(°F) / 降雨天数', 
+                    nameLocation: 'middle',
+                    nameGap: 55,
+                    nameTextStyle: { color: '#889', fontSize: 9 }, 
+                    axisLabel: { fontSize: 9, color: '#889' } 
+                },
+                { 
+                    type: 'value', 
+                    name: '日均行程量', 
+                    nameLocation: 'middle',
+                    nameGap: 45,
+                    nameTextStyle: { color: '#889', fontSize: 9 }, 
+                    axisLabel: { fontSize: 9, color: '#889' } 
+                }
+            ],
+            series: [
+                { name: '平均温度(F)', type: 'line', data: m.map(r => r.avg_temp || 0), smooth: true, itemStyle: { color: '#f12711' } },
+                { name: '降雨天数', type: 'bar', data: m.map(r => r.rainy_days || 0), itemStyle: { color: '#5470c6' } },
+                { name: '日均行程量', type: 'line', yAxisIndex: 1, data: m.map(r => r.avg_trips_per_day || 0), smooth: true, itemStyle: { color: '#f5af19' } },
+            ]
+        });
+    } catch(e) { console.error('图表15失败:', e); }
+}
+
+async function renderChart16() {
+    const chart = initChart('chart16');
+    if (!chart) return;
+    try {
+        const geoJson = await loadJSON('nyc_taxi_zones.geojson');
+        echarts.registerMap('nyc_taxi', geoJson);
+        const mapInfo = await loadJSON('chart_16_map_data.json');
+        
+        const boroNames = {
+            'Manhattan': '曼哈顿', 'Bronx': '布朗克斯', 'Brooklyn': '布鲁克林',
+            'Queens': '皇后区', 'Staten Island': '斯塔滕岛', 'EWR': '纽瓦克机场'
+        };
+        
+        const zoneNames = {};
+        const zoneBoroughs = {};
+        geoJson.features.forEach(f => {
+            const id = f.properties.LocationID;
+            zoneNames[id] = f.properties.zone;
+            zoneBoroughs[id] = f.properties.borough;
+        });
+        
+        chart.setOption({
+            tooltip: {
+                formatter: function(params) {
+                    if (!params.data || !params.data.value) return '';
+                    const locId = parseInt(params.name);
+                    const zoneName = zoneNames[locId] || '未知区域';
+                    const boroName = boroNames[zoneBoroughs[locId]] || zoneBoroughs[locId] || '未知';
+                    const value = params.data.value;
+                    return `<div style="padding:5px;"><b style="font-size:12px;">${zoneName}</b><br/><span style="color:#888;">${boroName} (ID:${locId})</span><br/><span style="font-size:13px;color:#00E5FF;">行程数: <b>${(value/1e6).toFixed(2)}M</b></span></div>`;
+                }
+            },
+            visualMap: {
+                type: 'piecewise',
+                pieces: [
+                    { min: 2000000, label: '≥2M', color: '#f12711' },
+                    { min: 1000000, max: 2000000, label: '1M-2M', color: '#f5af19' },
+                    { min: 500000, max: 1000000, label: '500K-1M', color: '#f59e19' },
+                    { min: 200000, max: 500000, label: '200K-500K', color: '#4a9aca' },
+                    { min: 100000, max: 200000, label: '100K-200K', color: '#2a7aaa' },
+                    { min: 50000, max: 100000, label: '50K-100K', color: '#1a5a8a' },
+                    { min: 10000, max: 50000, label: '10K-50K', color: '#1a4a6a' },
+                    { min: 1, max: 10000, label: '<10K', color: '#0f2a4a' },
+                    { min: 0, max: 0, label: '0', color: '#0a1a2a' },
+                ],
+                orient: 'vertical',
+                left: 10,
+                top: 10,
+                itemWidth: 14,
+                itemHeight: 14,
+                textStyle: { color: '#ccc', fontSize: 10 }
+            },
+            series: [{
+                type: 'map',
+                map: 'nyc_taxi',
+                roam: true,
+                zoom: 1.5,
+                center: [-73.95, 40.72],
+                scaleLimit: { min: 0.5, max: 5 },
+                label: { show: false },
+                emphasis: {
+                    label: { show: true, fontSize: 10, fontWeight: 'bold', color: '#fff' },
+                    itemStyle: { areaColor: '#00E5FF', shadowBlur: 20, shadowColor: 'rgba(0, 229, 255, 0.6)', borderColor: '#fff', borderWidth: 2 }
+                },
+                itemStyle: { areaColor: '#1a3a5a', borderColor: '#2a5a7a', borderWidth: 0.5 },
+                data: mapInfo.map_data
+            }]
+        });
+    } catch(e) { console.error('图表16失败:', e); }
+}
+
+async function renderChart17() {
+    const chart = initChart('chart17');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_17_top_pickup.json');
+        const boroNames = {'Manhattan':'曼哈顿','Queens':'皇后区','Brooklyn':'布鲁克林','Bronx':'布朗克斯','Staten Island':'斯塔滕岛','EWR':'纽瓦克','Unknown':'未知'};
+        const boroColors = {'Manhattan':'#f5af19','Queens':'#3cb371','Brooklyn':'#5470c6','Bronx':'#ee6666','Staten Island':'#91cc75','EWR':'#fac858','Unknown':'#889'};
+        const names = d.map(r => r.zone_name).reverse();
+        const values = d.map(r => r.trip_count).reverse();
+        const boroughs = d.map(r => r.borough).reverse();
+        
+        chart.setOption({
+            tooltip: { trigger: 'axis', formatter: function(p) {
+                const idx = values.length - 1 - p[0].dataIndex;
+                return `<b>${d[idx].zone_name}</b><br/>行政区: ${boroNames[d[idx].borough] || d[idx].borough}<br/>行程数: <b>${d[idx].trip_count.toLocaleString()}</b>`;
+            }},
+            grid: { left: 110, right: 50, top: 20, bottom: 30 },
+            xAxis: { 
+                type: 'value', 
+                axisLabel: { formatter: formatNum, fontSize: 9, color: '#889' } 
+            },
+            yAxis: { 
+                type: 'category', 
+                data: names, 
+                axisLabel: { fontSize: 9, color: '#889' } 
+            },
+            series: [{
+                type: 'bar',
+                data: values.map((v,i) => ({ value: v, itemStyle: { color: boroColors[boroughs[i]] || '#889' } })),
+                label: { show: true, position: 'right', formatter: p => formatNum(p.data.value), color: '#889', fontSize: 8 }
+            }]
+        });
+    } catch(e) { console.error('图表17失败:', e); }
+}
+
+// 区域对比分析 - 使用Chart14的数据
+async function renderChart18() {
+    const chart = initChart('chart18');
+    if (!chart) return;
+    try {
+        const d = await loadJSON('chart_14_regions.json');
+        const boroNames = {'Manhattan':'曼哈顿','Queens':'皇后区','Brooklyn':'布鲁克林',
+            'Bronx':'布朗克斯','Staten Island':'斯塔滕岛','EWR':'纽瓦克','Unknown':'未知'};
+        const data = d.borough_ranking.map(r => ({...r, name: boroNames[r.name] || r.name}));
+        
+        chart.setOption({
+            tooltip: { trigger: 'axis' },
+            legend: { data: ['行程量'], bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
+            grid: { left: 55, right: 25, top: 20, bottom: 55 },
+            xAxis: { 
+                type: 'category', 
+                data: data.map(d => d.name), 
+                axisLabel: { fontSize: 9, color: '#889', rotate: 30 } 
+            },
+            yAxis: { 
+                type: 'value', 
+                name: '行程数量', 
+                nameLocation: 'middle',
+                nameGap: 45,
+                nameTextStyle: { color: '#ccc', fontSize: 10 }, 
+                axisLabel: { fontSize: 9, color: '#889', formatter: formatNum } 
+            },
+            series: [{
+                name: '行程量', type: 'bar', data: data.map(d => d.value),
+                itemStyle: { color: '#3cb371' }
+            }]
+        });
+    } catch(e) { console.error('图表18失败:', e); }
+}
+
+async function renderDetailTable() {
+    try {
+        const d = await loadJSON('chart_detail_table.json');
+        const headerRow = document.getElementById('detailTableHeader');
+        const tbody = document.getElementById('detailTableBody');
+        
+        headerRow.innerHTML = d.columns.map(col => `<th>${col}</th>`).join('');
+        
+        // 显示全部12个月数据，yellow和green用不同颜色，其余统一颜色
+        tbody.innerHTML = d.data.map(row => `
+            <tr>
+                <td style="color:#b8d4e8;font-weight:600;">${row.month}</td>
+                <td style="color:#f5af19;">${(row.yellow_trips/1e6).toFixed(1)}M</td>
+                <td style="color:#3cb371;">${(row.green_trips/1e6).toFixed(1)}M</td>
+                <td style="color:#b8d4e8;font-weight:600;">${(row.total_trips/1e6).toFixed(1)}M</td>
+                <td style="color:#b8d4e8;">$${row.avg_fare.toFixed(1)}</td>
+                <td style="color:#b8d4e8;">${row.avg_distance.toFixed(1)}mi</td>
+                <td style="color:#b8d4e8;">${row.max_temp}°F</td>
+                <td style="color:#b8d4e8;">${row.precipitation.toFixed(1)}in</td>
+            </tr>
+        `).join('');
+    } catch(e) { console.error('详细表格失败:', e); }
+}
+
+// ========== 交互 ==========
+let autoPlayTimer = null;
+let isAutoPlaying = false;
+
+function toggleAutoPlay() {
+    const btn = document.getElementById('btnAutoPlay');
+    if (isAutoPlaying) {
+        clearInterval(autoPlayTimer);
+        autoPlayTimer = null;
+        isAutoPlaying = false;
+        btn.textContent = '自动播放';
+    } else {
+        isAutoPlaying = true;
+        btn.textContent = '停止播放';
+        let startMonth = currentMonth > 0 ? currentMonth : 1;
+        document.getElementById('monthFilter').value = startMonth;
+        currentMonth = startMonth;
+        updateDashboardForMonth(startMonth);
+        autoPlayTimer = setInterval(() => {
+            let next = currentMonth + 1;
+            if (next > 12) next = 1;
+            currentMonth = next;
+            document.getElementById('monthFilter').value = next;
+            updateDashboardForMonth(next);
+        }, 3000);
+    }
+}
+
+let isRotating = true;
+function toggleRotate() {
+    const btn = document.getElementById('btnRotate');
+    if (window.taxiControls) {
+        isRotating = !isRotating;
+        window.taxiControls.autoRotate = isRotating;
+        btn.textContent = isRotating ? '停止旋转' : '开始旋转';
+    }
+}
+
+async function onMonthChange() {
+    if (isAutoPlaying) { toggleAutoPlay(); }
+    currentMonth = parseInt(document.getElementById('monthFilter').value);
+    if (currentMonth === 0) {
+        await resetAll();
+    } else {
+        await updateDashboardForMonth(currentMonth);
+    }
+}
+
+async function updateDashboardForMonth(month) {
+    try {
+        const resp = await fetch(`/api/month_stats?month=${month}`);
+        const d = await resp.json();
+
+        if (charts['chart5'] && monthlyTrendData) {
+            updateChart5Highlight(charts['chart5'], monthlyTrendData, month);
+        }
+        // 区域排名图：始终更新数据，如果chart在隐藏页面中，switchPage时会重新渲染
+        if (charts['chart14'] && regionRankingData) {
+            updateChart14(charts['chart14'], regionRankingData, month);
+        }
+
+        document.getElementById('kpiTotal').textContent = formatNum(d.total_trips);
+        document.getElementById('kpiYellow').textContent = formatNum(d.yellow_trips);
+        document.getElementById('kpiGreen').textContent = formatNum(d.green_trips);
+        document.getElementById('kpiFare').textContent = '$' + ((d.yellow_avg_fare * d.yellow_trips + d.green_avg_fare * d.green_trips) / (d.total_trips || 1)).toFixed(2);
+        document.getElementById('kpiDist').textContent = ((d.yellow_avg_distance * d.yellow_trips + d.green_avg_distance * d.green_trips) / (d.total_trips || 1)).toFixed(2) + ' mi';
+        document.getElementById('kpiDur').textContent = ((d.yellow_avg_duration * d.yellow_trips + d.green_avg_duration * d.green_trips) / (d.total_trips || 1)).toFixed(1) + ' min';
+
+        if (charts['chart6']) {
+            charts['chart6'].setOption({
+                xAxis: { data: d.yellow_hourly.map((_,i) => `${String(i).padStart(2,'0')}:00`) },
+                series: [
+                    { name: 'Yellow出租车', data: d.yellow_hourly },
+                    { name: 'Green出租车', data: d.green_hourly }
+                ]
+            });
+        }
+
+        if (charts['chart7']) {
+            const payNames = {'Credit Card': '信用卡', 'Cash': '现金'};
+            charts['chart7'].setOption({
+                series: [
+                    { name: 'Yellow', data: Object.entries(d.yellow_payment).map(([k,v]) => ({name: payNames[k]||k, value: v})) },
+                    { name: 'Green', data: Object.entries(d.green_payment).map(([k,v]) => ({name: payNames[k]||k, value: v})) }
+                ]
+            });
+        }
+
+        if (charts['chart8']) {
+            const yBins = d.yellow_distance_hist.bins;
+            const yCounts = d.yellow_distance_hist.counts;
+            const gCounts = d.green_distance_hist.counts;
+            const merged = yCounts.map((v,i) => v + (gCounts[i] || 0));
+            charts['chart8'].setOption({
+                xAxis: { data: yBins.map(b => b.toFixed(1)) },
+                series: [{ data: merged }]
+            }, false, true);
+        }
+
+        if (charts['chart9']) {
+            const yBox = d.yellow_fare_box;
+            const gBox = d.green_fare_box;
+            charts['chart9'].setOption({
+                title: {
+                    text: '基础票价均值: Yellow $' + yBox.mean.toFixed(2) + ' | Green $' + gBox.mean.toFixed(2) + '（不含小费等附加费用）',
+                    left: 'center', top: 5,
+                    textStyle: { color: '#889', fontSize: 9 }
+                },
+                series: [
+                        {
+                            name: 'Yellow出租车',
+                            type: 'boxplot',
+                            data: [[yBox.min, yBox.q1, yBox.median, yBox.q3, yBox.max]],
+                            itemStyle: { color: 'rgba(245,175,25,0.6)', borderColor: '#f5af19', borderWidth: 2 },
+                            boxWidth: ['25%', '25%']
+                        },
+                        {
+                            name: 'Green出租车',
+                            type: 'boxplot',
+                            data: [[gBox.min, gBox.q1, gBox.median, gBox.q3, gBox.max]],
+                            itemStyle: { color: 'rgba(60,179,113,0.6)', borderColor: '#3cb371', borderWidth: 2 },
+                            boxWidth: ['25%', '25%']
+                        }
+                    ]
+            });
+        }
+
+    } catch(e) { console.error('月份更新失败:', e); }
+}
+
+let kpiVisible = true;
+function toggleKPI() {
+    const kpiSides = document.querySelector('.kpi-sides');
+    const btn = document.getElementById('btnToggleKPI');
+    if (kpiSides) {
+        kpiVisible = !kpiVisible;
+        kpiSides.style.display = kpiVisible ? 'flex' : 'none';
+        btn.textContent = kpiVisible ? '隐藏KPI' : '显示KPI';
+    }
+}
+
+function resetAll() {
+    if (isAutoPlaying) { toggleAutoPlay(); }
+    document.getElementById('monthFilter').value = '0';
+    currentMonth = 0;
+    renderKPIs(); renderChart5(); renderChart6(); renderChart7();
+    renderChart8(); renderChart9(); renderChart11(); renderChart12();
+    renderChart14();
+}
+
+// ========== 初始化 ==========
+async function init() {
+    try {
+        init3DTaxi();
+        
+        await renderKPIs();
+        await Promise.all([
+            renderChart2(), renderChart3(), renderChart4(), renderChart5(),
+            renderChart6(), renderChart7(), renderChart8(), renderChart9(),
+            renderChart10(), renderChart11(), renderChart12(), renderChart13(),
+            renderChart14(), renderChart15(), renderChart16(), renderChart17(),
+            renderChart18()
+        ]);
+        await renderDetailTable();
+        
+        // 添加四角框线装饰和双击事件
+        setTimeout(() => {
+            document.querySelectorAll('.chart-card').forEach(card => {
+                // 添加左下和右下角装饰
+                if (!card.querySelector('.corner-bl')) {
+                    card.insertAdjacentHTML('beforeend', '<div class="corner-bl"></div><div class="corner-br"></div>');
+                }
+                const chartContent = card.querySelector('.chart-content[id]');
+                const chartHeader = card.querySelector('.chart-title');
+                if (chartContent && chartContent.id && charts[chartContent.id]) {
+                    const chartId = chartContent.id;
+                    const title = chartHeader ? chartHeader.textContent : '图表详情';
+                    card.addEventListener('dblclick', () => openFullscreen(chartId, title));
+                }
+            });
+        }, 2000);
+        
+        document.getElementById('loading').style.display = 'none';
+    } catch(e) {
+        console.error('初始化失败:', e);
+        document.getElementById('loading').innerHTML =
+            '<div style="color:#f12711;font-size:18px;">仪表盘加载失败</div>' +
+            '<div style="color:#889;margin-top:8px;">' + e.message + '</div>';
+    }
+}
+
+window.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body>
+</html>
