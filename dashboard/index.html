@@ -522,7 +522,7 @@
   
   <div class="chart-box" style="grid-column: 5 / 6; grid-row: 4 / 5;" data-chart="prediction" ondblclick="zoomChart('prediction')">
     <div class="chart-title">
-      📊 预测验证对比
+      📊 预测验证对比 (LOO-CV MAPE: 5.4%)
       <span class="chart-hint">双击放大</span>
     </div>
     <div class="chart-container" id="chartPrediction"></div>
@@ -656,15 +656,20 @@ const clusterData = [
   {x:0.4, y:0.2, cluster:2, month:'12月', company:'green'}
 ];
 
+// ==================== LOO-CV预测数据 ====================
+// 留一法交叉验证：每次用11个月训练三次多项式回归，预测留出的1个月
 const predictionData = {
   yellow: {
-    actual: [8597058,8336670,9243958,9121592,9039888,8530395,7679818,7678064,7859379,8593500,7921310,7937122],
-    predicted: [8800000,8700000,8900000,9000000,8950000,8800000,8700000,8600000,8500000,8400000,8300000,8200000]
+    actual: [8597058, 8336670, 9243958, 9121592, 9039888, 8530395, 7679818, 7678064, 7859379, 8593500, 7921310, 7937122],
+    predicted: [8189001, 9003787, 8830871, 8812989, 8651891, 8521022, 8421229, 8162293, 7887338, 7554472, 7903818, 8992344],
+    mape: 5.58
   },
   green: {
-    actual: [770877,749527,813829,777568,773527,717940,664659,647479,648293,690452,637566,663021],
-    predicted: [780000,770000,760000,750000,740000,730000,720000,710000,700000,690000,680000,670000]
-  }
+    actual: [770877, 749527, 813829, 777568, 773527, 717940, 664659, 647479, 648293, 690452, 637566, 663021],
+    predicted: [740532, 796770, 775815, 771842, 744550, 725369, 702240, 675088, 649228, 623414, 650934, 705517],
+    mape: 4.06
+  },
+  total_mape: 5.4
 };
 
 // ==================== 全局状态 ====================
@@ -1383,7 +1388,7 @@ function renderZoomPrediction() {
       }
     },
     legend: {
-      data: ['Yellow 实际', 'Yellow 预测', 'Green 实际', 'Green 预测'],
+      data: ['Yellow 实际', 'Yellow LOO-CV预测', 'Green 实际', 'Green LOO-CV预测'],
       top: 10, right: 20,
       textStyle: { color: '#8892b0', fontSize: 14 }
     },
@@ -1407,7 +1412,7 @@ function renderZoomPrediction() {
         itemStyle: { color: '#ffd700' }
       },
       {
-        name: 'Yellow 预测', type: 'line', data: predictionData.yellow.predicted,
+        name: 'Yellow LOO-CV预测', type: 'line', data: predictionData.yellow.predicted,
         smooth: true, symbol: 'diamond', symbolSize: 10,
         lineStyle: { color: '#ffd700', width: 2, type: 'dashed' },
         itemStyle: { color: '#ffd700aa' }
@@ -1419,7 +1424,7 @@ function renderZoomPrediction() {
         itemStyle: { color: '#00e676' }
       },
       {
-        name: 'Green 预测', type: 'line', data: predictionData.green.predicted,
+        name: 'Green LOO-CV预测', type: 'line', data: predictionData.green.predicted,
         smooth: true, symbol: 'diamond', symbolSize: 10,
         lineStyle: { color: '#00e676', width: 2, type: 'dashed' },
         itemStyle: { color: '#00e676aa' }
@@ -1831,7 +1836,7 @@ function renderPrediction(month) {
       }
     },
     legend: {
-      data: ['Yellow 实际', 'Yellow 预测', 'Green 实际', 'Green 预测'],
+      data: ['Yellow 实际', 'Yellow LOO-CV预测', 'Green 实际', 'Green LOO-CV预测'],
       top: 5, right: 10,
       textStyle: { color: '#8892b0', fontSize: 9 }
     },
@@ -1855,7 +1860,7 @@ function renderPrediction(month) {
         itemStyle: { color: '#ffd700' }
       },
       {
-        name: 'Yellow 预测', type: 'line', data: predictionData.yellow.predicted,
+        name: 'Yellow LOO-CV预测', type: 'line', data: predictionData.yellow.predicted,
         smooth: true, symbol: 'diamond', symbolSize: 5,
         lineStyle: { color: '#ffd700', width: 1, type: 'dashed' },
         itemStyle: { color: '#ffd700aa' }
@@ -1867,7 +1872,7 @@ function renderPrediction(month) {
         itemStyle: { color: '#00e676' }
       },
       {
-        name: 'Green 预测', type: 'line', data: predictionData.green.predicted,
+        name: 'Green LOO-CV预测', type: 'line', data: predictionData.green.predicted,
         smooth: true, symbol: 'diamond', symbolSize: 5,
         lineStyle: { color: '#00e676', width: 1, type: 'dashed' },
         itemStyle: { color: '#00e676aa' }

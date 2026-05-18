@@ -513,8 +513,9 @@ def chart_10_cluster_radar():
 # Chart 11 & 12: Trip Volume Prediction & Residuals
 # ─────────────────────────────────────────────
 def chart_11_12_prediction(stats):
-    print("\n[Chart 11&12] Trip volume prediction...")
+    print("\n[Chart 11&12] Trip volume prediction (LOO-CV)...")
     from sklearn.linear_model import LinearRegression
+    from sklearn.preprocessing import PolynomialFeatures
 
     monthly = stats['monthly_counts']
     months = np.array(range(1, 13)).reshape(-1, 1)
@@ -527,47 +528,61 @@ def chart_11_12_prediction(stats):
                 if item['month'] == m)
         all_trips.append(y + g)
 
-    # Train on Jan-Nov, predict Dec
-    X_train = months[:11]
-    y_train = np.array(all_trips[:11])
-
-    # Polynomial features for better fit
-    from sklearn.preprocessing import PolynomialFeatures
+    # ── 留一法交叉验证 (LOO-CV) ──
+    # 每次留出1个月作为测试集，其余11个月训练三次多项式回归，重复12次
     poly = PolynomialFeatures(degree=3)
-    X_poly = poly.fit_transform(X_train)
+    loo_predictions = []
+    loo_residuals = []
 
-    model = LinearRegression()
-    model.fit(X_poly, y_train)
+    for test_idx in range(12):
+        train_idx = [i for i in range(12) if i != test_idx]
+        X_train = months[train_idx]
+        y_train = np.array([all_trips[i] for i in train_idx])
 
-    # Predict all months for visualization
-    X_all_poly = poly.transform(months)
-    predicted = model.predict(X_all_poly)
+        X_test = months[test_idx].reshape(1, -1)
+        y_test = all_trips[test_idx]
 
-    # Also predict Dec specifically
-    residuals = np.array(all_trips) - predicted
+        X_poly_train = poly.fit_transform(X_train)
+        X_poly_test = poly.transform(X_test)
+
+        model = LinearRegression()
+        model.fit(X_poly_train, y_train)
+        y_pred = model.predict(X_poly_test)[0]
+
+        loo_predictions.append(round(float(y_pred), 2))
+        loo_residuals.append(round(float(y_test - y_pred), 2))
+
+    loo_mape = round(float(np.mean(np.abs(loo_residuals) / np.array(all_trips)) * 100), 2)
 
     result = {
         'months': list(range(1, 13)),
         'month_labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         'actual': all_trips,
-        'predicted': predicted.tolist(),
-        'residuals': residuals.tolist(),
-        'train_months': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11],
-        'test_month': 12,
-        'mape': round(float(np.mean(np.abs(residuals[:11]) / np.array(all_trips[:11])) * 100), 2),
+        'predicted': loo_predictions,
+        'residuals': loo_residuals,
+        'train_method': 'LOO-CV (Leave-One-Out Cross Validation)',
+        'train_detail': '每次留出1个月作为测试集，其余11个月训练三次多项式回归，重复12次',
+        'mape_loo_cv': loo_mape,
+        'mape_note': '基于LOO-CV计算，每次预测对该月来说是未见过的数据，比训练集MAPE更客观',
     }
     jdump(result, 'chart_11_prediction.json')
 
     # Residual distribution data
+    residuals_abs = [abs(r) for r in loo_residuals]
     resid_data = {
-        'residuals': residuals.tolist(),
+        'residuals': loo_residuals,
         'labels': ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-        'mean_residual': round(float(np.mean(residuals)), 2),
-        'std_residual': round(float(np.std(residuals)), 2),
+        'mean_residual': round(float(np.mean(loo_residuals)), 2),
+        'std_residual': round(float(np.std(loo_residuals)), 2),
+        'mae': round(float(np.mean(residuals_abs)), 2),
+        'rmse': round(float(np.sqrt(np.mean(np.array(loo_residuals)**2))), 2),
+        'mape_loo_cv': loo_mape,
+        'note': 'LOO-CV残差：正=实际>预测(低估)，负=实际<预测(高估)',
     }
     jdump(resid_data, 'chart_12_residuals.json')
+    print(f"  LOO-CV MAPE: {loo_mape}%")
     return result
 
 

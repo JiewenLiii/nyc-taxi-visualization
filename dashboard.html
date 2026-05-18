@@ -1473,8 +1473,12 @@ async function renderChart11() {
         const d = await loadJSON('chart_11_prediction.json');
         chart.setOption({
             tooltip: { trigger: 'axis' },
-            legend: { data: ['实际值', '预测值'], bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
-            grid: { left: 55, right: 25, top: 25, bottom: 55 },
+            legend: { data: ['实际值', 'LOO-CV预测值'], bottom: 0, textStyle: { color: '#889', fontSize: 8 } },
+            grid: { left: 55, right: 25, top: 30, bottom: 55 },
+            title: {
+                text: `MAPE: ${d.mape_loo_cv}% (留一法)`, textStyle: { color: '#f5a623', fontSize: 10 },
+                left: 'center', top: 5
+            },
             xAxis: { 
                 type: 'category', 
                 data: d.month_labels, 
@@ -1490,7 +1494,15 @@ async function renderChart11() {
             },
             series: [
                 { name: '实际值', type: 'bar', data: d.actual, itemStyle: { color: '#5470c6' } },
-                { name: '预测值', type: 'line', data: d.predicted, itemStyle: { color: '#f12711' }, lineStyle: { type: 'dashed' } },
+                { 
+                    name: 'LOO-CV预测值', type: 'line', data: d.predicted, 
+                    itemStyle: { color: '#f12711' }, lineStyle: { type: 'dashed' },
+                    symbol: 'diamond', symbolSize: 6,
+                    markLine: {
+                        silent: true,
+                        data: [{ yAxis: d.actual[11], label: { show: false } }]
+                    }
+                },
             ]
         });
     } catch(e) { console.error('图表11失败:', e); }
@@ -1503,8 +1515,13 @@ async function renderChart12() {
         const d = await loadJSON('chart_12_residuals.json');
         const residualsM = d.residuals.map(r => (r / 1000000).toFixed(2));
         chart.setOption({
-            tooltip: { trigger: 'axis', formatter: p => `${p[0].name}<br/>残差: <b>${p[0].data}M</b>` },
-            grid: { left: 55, right: 25, top: 25, bottom: 55 },
+            tooltip: { trigger: 'axis', formatter: p => `${p[0].name}<br/>LOO-CV残差: <b>${p[0].data}M</b>` },
+            grid: { left: 55, right: 25, top: 30, bottom: 55 },
+            title: {
+                text: `RMSE: ${(d.rmse / 1000000).toFixed(2)}M | MAE: ${(d.mae / 1000000).toFixed(2)}M`,
+                textStyle: { color: '#f5a623', fontSize: 10 },
+                left: 'center', top: 5
+            },
             xAxis: { 
                 type: 'category', 
                 data: d.labels, 
@@ -1512,7 +1529,7 @@ async function renderChart12() {
             },
             yAxis: { 
                 type: 'value', 
-                name: '残差 (百万行程)', 
+                name: 'LOO-CV残差 (百万)', 
                 nameLocation: 'middle',
                 nameGap: 50,
                 nameTextStyle: { color: '#ccc', fontSize: 10 }, 
@@ -1523,7 +1540,13 @@ async function renderChart12() {
                     value: parseFloat(r),
                     itemStyle: { color: d.residuals[i] > 0 ? '#91cc75' : '#ee6666' }
                 })),
-                markLine: { data: [{ yAxis: 0, label: { show: false } }], silent: true }
+                markLine: {
+                    data: [
+                        { yAxis: 0, label: { show: false } },
+                        { yAxis: d.mape_loo_cv, label: { formatter: `MAPE: ${d.mape_loo_cv}%`, color: '#f5a623', fontSize: 9 }, lineStyle: { type: 'dashed', color: '#f5a62344' } }
+                    ],
+                    silent: true
+                }
             }]
         });
     } catch(e) { console.error('图表12失败:', e); }

@@ -1,18 +1,58 @@
-# 原始数据（太大，从官网下载）
+# =============================================
+# NYC Taxi Visualization - GitIgnore
+# =============================================
+
+# --- 大数据文件（从公开源下载）---
 Yellow/
 Green/
-
-# 清洗后数据（中间产物，可重新生成）
 Yellow_清洗后/
 Green_清洗后/
+nyc_weather_2018.csv
 
-# Python缓存
+# --- Python缓存 ---
 __pycache__/
-__pycache__.zip
+*.pyc
+*.pyo
+*.pyd
+.Python
 
-# 临时文件
-bg.jpg
+# --- Node.js ---
+node_modules/
+package-lock.json
+npm-debug.log*
+
+# --- 临时/缓存文件 ---
+*.tmp
+*.cache
+*.bak
+*.swp
+*.swo
+*~
 dashboard_data/_sample_cache.parquet
 dashboard_data/bg(1).jpg
-dashboard_data/_shapefiles/
-nyc_weather_2018.csv
+
+# --- 旧流程文件（数据已过时）---
+# analysis/                # 旧流程生成的图表，数据已过时
+# data/                    # 旧流程CSV，数据与新流程不一致
+# generate_charts.py       # 读取旧CSV，输出已过时
+# generate_dashboard.py     # 旧生成脚本
+# preprocess.py            # 旧预处理脚本
+
+# --- 报告文件（自行生成）---
+NYC_Taxi_分析报告.md
+NYC_Taxi_分析报告.docx
+NYC_Taxi_汇报演讲.pptx
+数据真实性验证报告.md
+report/
+
+# --- 大文件（可选，根据仓库大小限制决定）---
+*.zip                    # taxi_zones.zip 等压缩包
+*.pdf                    # 数据字典PDF
+*.pptx                   # PPT文件自行编译
+
+# --- IDE/编辑器 ---
+.vscode/
+.idea/
+*.sublime-*
+.DS_Store
+Thumbs.db
